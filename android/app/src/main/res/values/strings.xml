@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Leyla</string>
+
+    <!-- Tab bar -->
+    <string name="tab_home">Home</string>
+    <string name="tab_games">Games</string>
+    <string name="tab_journal">Journal</string>
+    <string name="tab_settings">Settings</string>
+
+    <!-- Home chrome -->
+    <string name="add_widget">add widget</string>
+    <string name="edit_profile">Edit profile</string>
+    <string name="leyla_logo_description">Leyla</string>
+
+    <!-- Hero "miss you" button. The pronoun is baked into each key: pronouns
+         are not isolable tokens across languages, so the whole sentence is
+         translated as one unit (same reasoning as the iOS build). -->
+    <string name="hero_thinking_of_her">Let %1$s know you\'re thinking of her</string>
+    <string name="hero_thinking_of_him">Let %1$s know you\'re thinking of him</string>
+    <string name="hero_thinking_of_them">Let %1$s know you\'re thinking of them</string>
+    <string name="hero_sent">Sent!</string>
+    <string name="hero_send_accessibility">Send I miss you to %1$s</string>
+    <string name="hero_sent_accessibility">Sent</string>
+
+    <!-- Map / distance -->
+    <string name="map_see_each_other">See each other on the map</string>
+    <string name="map_turn_on_location">Turn on location so you and %1$s appear here.</string>
+    <string name="distance_less_than_km">Less than 1 km apart 💜</string>
+    <string name="distance_km_apart">%1$d km apart</string>
+
+    <!-- Names -->
+    <string name="you">You</string>
+    <string name="your_partner">your partner</string>
+
+    <!-- Cycle cards. Android's equivalent of Apple Health is Health Connect. -->
+    <string name="health_source">Health Connect</string>
+    <string name="health_source_accessibility">Powered by Health Connect</string>
+    <string name="cycle_setup_title">Cycle tracking with Health Connect</string>
+    <string name="cycle_setup_body">Leyla reads your menstrual cycle from Health Connect to show your current phase, cycle day and next-period estimate — or gives you supportive tips for your partner\'s cycle.</string>
+    <string name="cycle_self_subtitle">Day %1$d · next period %2$s</string>
+    <string name="cycle_next_today">today</string>
+    <string name="cycle_next_tomorrow">tomorrow</string>
+    <string name="cycle_next_in_days">in %1$d days</string>
+    <string name="cycle_partner_title">%1$s · %2$s</string>
+    <string name="cycle_partner_prompt_title">Check %1$s\'s cycle</string>
+    <string name="cycle_partner_prompt_body">Gentle tips based on her Health Connect cycle — once she shares it.</string>
+
+    <!-- Cycle phases -->
+    <string name="phase_menstrual">Period</string>
+    <string name="phase_follicular">Follicular phase</string>
+    <string name="phase_ovulation">Ovulation phase</string>
+    <string name="phase_luteal">Luteal phase</string>
+    <string name="phase_hint_menstrual">She may want comfort and rest 💛</string>
+    <string name="phase_hint_follicular">Energy\'s on the rise ✨</string>
+    <string name="phase_hint_ovulation">Peak energy — and the fertile window 🌸</string>
+    <string name="phase_hint_luteal">Winding down — a little extra care goes far 💛</string>
+    <string name="phase_tip_menstrual">Bring her favorite snacks or a warm drink</string>
+    <string name="phase_tip_follicular">Her energy\'s rising — suggest something active or social</string>
+    <string name="phase_tip_ovulation">She may feel confident and social — plan a fun night out</string>
+    <string name="phase_tip_luteal">Keep plans cozy and low-key</string>
+
+    <!-- Pregnancy -->
+    <string name="pregnancy_yours">Your pregnancy</string>
+    <string name="pregnancy_partner_expecting">%1$s is expecting</string>
+    <string name="pregnancy_week_due_any_day">Week %1$d · due any day 💛</string>
+    <string name="pregnancy_week_days_to_go">Week %1$d · %2$d days to go</string>
+
+    <!-- Placeholder tabs -->
+    <string name="coming_soon">Coming soon</string>
+    <string name="games_blurb">Quizzes, debates and little games to play together.</string>
+    <string name="journal_blurb">Your shared diary — words and photos, day by day.</string>
+    <string name="settings_blurb">Your account, your partner, and how Leyla behaves.</string>
+</resources>
