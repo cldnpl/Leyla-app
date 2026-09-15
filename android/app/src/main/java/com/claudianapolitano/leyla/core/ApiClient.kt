@@ -61,12 +61,19 @@ object ApiClient {
         query: Map<String, String> = emptyMap(),
     ): T = send(path, HttpMethod.Post, body, query)
 
+    /**
+     * `authorized = false` is for the endpoints that establish a session rather
+     * than use one — register, login, logout. Sending a stale bearer with those
+     * is at best noise and at worst gets the request rejected before the
+     * credentials in the body are ever read.
+     */
     suspend inline fun <reified T> send(
         path: String,
         method: HttpMethod,
         body: Any?,
         query: Map<String, String> = emptyMap(),
-    ): T = json.decodeFromString(raw(path, method, body, query = query))
+        authorized: Boolean = true,
+    ): T = json.decodeFromString(raw(path, method, body, query = query, authorized = authorized))
 
     /** Fire-and-forget variant for endpoints that answer with an empty body. */
     suspend fun sendVoid(
@@ -74,8 +81,9 @@ object ApiClient {
         method: HttpMethod,
         body: Any? = null,
         query: Map<String, String> = emptyMap(),
+        authorized: Boolean = true,
     ) {
-        raw(path, method, body, query = query)
+        raw(path, method, body, query = query, authorized = authorized)
     }
 
     /**

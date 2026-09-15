@@ -7,7 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.LaunchedEffect
 import com.claudianapolitano.leyla.core.Session
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
-import com.claudianapolitano.leyla.feature.MainTabView
+import com.claudianapolitano.leyla.feature.RootScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -15,11 +15,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             LeylaTheme {
-                // Sign-in, pairing and onboarding are routed by `Session.state`
-                // on iOS's RootView; until those screens are ported the app
-                // opens straight on the tab shell.
                 LaunchedEffect(Unit) { Session.bootstrap() }
-                MainTabView()
+                RootScreen()
             }
         }
     }
