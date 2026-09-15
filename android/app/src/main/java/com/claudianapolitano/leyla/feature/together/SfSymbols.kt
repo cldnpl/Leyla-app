@@ -7,6 +7,7 @@ import androidx.compose.material.icons.automirrored.filled.ListAlt
 import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.material.icons.filled.AccessTimeFilled
 import androidx.compose.material.icons.filled.AccountBalance
@@ -62,7 +63,6 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VolunteerActivism
 import androidx.compose.material.icons.filled.Umbrella
@@ -101,7 +101,7 @@ fun sfSymbolIcon(name: String?): ImageVector = when (name) {
     "camera.viewfinder", "camera.rotate" -> Icons.Filled.CameraAlt
     "car.fill" -> Icons.Filled.DirectionsCar
     "cart.fill" -> Icons.Filled.ShoppingCart
-    "chart.line.uptrend.xyaxis" -> Icons.Filled.TrendingUp
+    "chart.line.uptrend.xyaxis" -> Icons.AutoMirrored.Filled.TrendingUp
     "checkmark", "checkmark.circle.fill", "checkmark.seal.fill" -> Icons.Filled.CheckCircle
     "clock.fill" -> Icons.Filled.AccessTimeFilled
     "cloud.rain.fill" -> Icons.Filled.Umbrella

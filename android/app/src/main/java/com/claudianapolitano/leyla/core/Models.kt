@@ -50,6 +50,13 @@ data class CoupleResponse(
     val partner: User? = null,
 )
 
+/** A short-lived code one partner shows so the other can join the couple. */
+@Serializable
+data class PairingCode(
+    val code: String,
+    val expiresAt: String? = null,
+)
+
 @Serializable
 data class MissYouEvent(
     val id: String,

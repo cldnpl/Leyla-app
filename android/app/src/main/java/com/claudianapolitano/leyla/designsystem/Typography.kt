@@ -16,6 +16,14 @@ import androidx.compose.ui.unit.sp
  */
 object IOSText {
     val largeTitle = TextStyle(fontSize = 34.sp, lineHeight = 41.sp, fontWeight = FontWeight.Normal)
+
+    /**
+     * The onboarding headline: iOS's `.largeTitle` in the rounded design. Its
+     * line height is explicit because these titles wrap to two lines, and a
+     * size set without one falls back to the theme's body leading — which draws
+     * the second line straight through the first.
+     */
+    val display = TextStyle(fontSize = 34.sp, lineHeight = 41.sp, fontWeight = FontWeight.Bold)
     val title = TextStyle(fontSize = 28.sp, lineHeight = 34.sp, fontWeight = FontWeight.Normal)
     val title2 = TextStyle(fontSize = 22.sp, lineHeight = 28.sp, fontWeight = FontWeight.Normal)
     val title3 = TextStyle(fontSize = 20.sp, lineHeight = 25.sp, fontWeight = FontWeight.Normal)

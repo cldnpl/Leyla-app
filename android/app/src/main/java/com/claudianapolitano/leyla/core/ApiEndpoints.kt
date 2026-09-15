@@ -8,6 +8,40 @@ import io.ktor.http.HttpMethod
  */
 object LeylaApi {
 
+    // MARK: - Auth
+
+    suspend fun register(email: String, password: String, displayName: String): AuthResponse =
+        ApiClient.send(
+            "/v1/auth/register",
+            HttpMethod.Post,
+            RegisterBody(email, password, displayName),
+            authorized = false,
+        )
+
+    suspend fun login(email: String, password: String): AuthResponse =
+        ApiClient.send("/v1/auth/login", HttpMethod.Post, LoginBody(email, password), authorized = false)
+
+    /**
+     * Retires the refresh token server-side. Sent unauthorized on purpose: the
+     * token in the body is the credential, and the access token may already
+     * have expired by the time someone signs out.
+     */
+    suspend fun logout(refreshToken: String) {
+        ApiClient.sendVoid(
+            "/v1/auth/logout",
+            HttpMethod.Post,
+            LogoutBody(refreshToken),
+            authorized = false,
+        )
+    }
+
+    // MARK: - Pairing
+
+    suspend fun createPairingCode(): PairingCode = ApiClient.post("/v1/pairing/code")
+
+    suspend fun redeemPairing(code: String): CoupleResponse =
+        ApiClient.post("/v1/pairing/redeem", RedeemBody(code))
+
     suspend fun me(): User = ApiClient.get("/v1/me")
 
     // MARK: - Profile
@@ -60,6 +94,18 @@ object LeylaApi {
 
     suspend fun partnerPregnancy(): PartnerPregnancy = ApiClient.get("/v1/pregnancy")
 }
+
+@kotlinx.serialization.Serializable
+data class RegisterBody(val email: String, val password: String, val displayName: String)
+
+@kotlinx.serialization.Serializable
+data class LoginBody(val email: String, val password: String)
+
+@kotlinx.serialization.Serializable
+data class LogoutBody(val refreshToken: String)
+
+@kotlinx.serialization.Serializable
+data class RedeemBody(val code: String)
 
 @kotlinx.serialization.Serializable
 data class UpdateNameBody(val displayName: String)
