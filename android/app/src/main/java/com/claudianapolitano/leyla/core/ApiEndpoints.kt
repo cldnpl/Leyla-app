@@ -10,6 +10,28 @@ object LeylaApi {
 
     suspend fun me(): User = ApiClient.get("/v1/me")
 
+    // MARK: - Profile
+
+    suspend fun updateDisplayName(displayName: String): User =
+        ApiClient.send("/v1/me", HttpMethod.Patch, UpdateNameBody(displayName))
+
+    suspend fun updatePartnerPronoun(pronoun: String): User =
+        ApiClient.send("/v1/me", HttpMethod.Patch, UpdatePronounBody(pronoun))
+
+    /** Persists the account-level cycle settings so they survive a reinstall. */
+    suspend fun updateCycleSettings(hasCycle: Boolean? = null, shareLevel: String? = null): User =
+        ApiClient.send("/v1/me", HttpMethod.Patch, UpdateCycleSettingsBody(hasCycle, shareLevel))
+
+    /**
+     * Uploads a new profile photo. The server saves it, sets `avatarPath` on the
+     * account and hands back the updated user.
+     */
+    suspend fun uploadAvatar(jpeg: ByteArray): User = ApiClient.json.decodeFromString(
+        ApiClient.uploadImage("/v1/me/avatar", jpeg, filename = "avatar.jpg"),
+    )
+
+    suspend fun deleteAvatar(): User = ApiClient.send("/v1/me/avatar", HttpMethod.Delete, null)
+
     suspend fun getCouple(): CoupleResponse = ApiClient.get("/v1/couple")
 
     // MARK: - "I miss you"
@@ -38,6 +60,15 @@ object LeylaApi {
 
     suspend fun partnerPregnancy(): PartnerPregnancy = ApiClient.get("/v1/pregnancy")
 }
+
+@kotlinx.serialization.Serializable
+data class UpdateNameBody(val displayName: String)
+
+@kotlinx.serialization.Serializable
+data class UpdatePronounBody(val partnerPronoun: String)
+
+@kotlinx.serialization.Serializable
+data class UpdateCycleSettingsBody(val hasCycle: Boolean?, val cycleShareLevel: String?)
 
 @kotlinx.serialization.Serializable
 data class UpdateLocationBody(

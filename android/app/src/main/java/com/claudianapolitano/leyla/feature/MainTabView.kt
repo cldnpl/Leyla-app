@@ -33,8 +33,9 @@ import com.claudianapolitano.leyla.R
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
-import com.claudianapolitano.leyla.feature.home.HomeScreen
+import com.claudianapolitano.leyla.feature.home.HomeTab
 import com.claudianapolitano.leyla.feature.placeholder.ComingSoonScreen
+import com.claudianapolitano.leyla.feature.together.GamesTab
 
 /** The four tabs, in the order iOS's `TabView` declares them. */
 enum class Tab(
@@ -106,10 +107,13 @@ fun MainTabView(modifier: Modifier = Modifier) {
                 .padding(innerPadding)
         ) {
             NavHost(navController = navController, startDestination = Tab.HOME.route) {
-                composable(Tab.HOME.route) { HomeScreen() }
-                composable(Tab.GAMES.route) {
-                    ComingSoonScreen(Tab.GAMES.titleRes, Icons.Filled.AutoAwesome, R.string.games_blurb)
-                }
+                // Home pushes the map, the profile editor and the cycle screen
+                // onto its own stack, so those stay under the tab bar too.
+                composable(Tab.HOME.route) { HomeTab() }
+                // Games carries its own navigation stack (quiz packs, game
+                // rounds, the paywall), the way iOS wraps the tab in a
+                // NavigationStack — so those pushes stay under the tab bar.
+                composable(Tab.GAMES.route) { GamesTab() }
                 composable(Tab.JOURNAL.route) {
                     ComingSoonScreen(Tab.JOURNAL.titleRes, Icons.AutoMirrored.Filled.MenuBook, R.string.journal_blurb)
                 }

@@ -70,6 +70,12 @@ object Session {
         }
     }
 
+    /** Publishes a freshly saved account (name, avatar, cycle settings). */
+    fun updateUser(user: User) {
+        PartnerPrefs.pronoun = PartnerPronoun.from(user.partnerPronoun)
+        _snapshot.update { it.copy(user = user) }
+    }
+
     fun noteRemoteChange() {
         _snapshot.update { it.copy(remoteChangeId = it.remoteChangeId + 1) }
     }
