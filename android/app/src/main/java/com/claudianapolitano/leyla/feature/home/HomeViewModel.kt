@@ -143,12 +143,6 @@ class HomeViewModel : ViewModel() {
         }
     }
 
-    // Navigation targets that land with their own screens.
-    fun onAddWidget() = Unit
-    fun onEditProfile() = Unit
-    fun onOpenMap() = Unit
-    fun onOpenCycle() = Unit
-
     // MARK: - Copy
 
     private fun myName(displayName: String?): String =

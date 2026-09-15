@@ -66,6 +66,38 @@
     <string name="pregnancy_week_due_any_day">Week %1$d · due any day 💛</string>
     <string name="pregnancy_week_days_to_go">Week %1$d · %2$d days to go</string>
 
+    <!-- Full map -->
+    <string name="map_title">Map</string>
+    <string name="maps_key_missing">Add MAPS_API_KEY to android/local.properties to show the map.</string>
+    <string name="map_partner_sharing">%1$s is sharing 💜</string>
+    <string name="map_partner_not_sharing">%1$s isn\'t sharing their location right now.</string>
+    <string name="map_sharing_on">Sharing my location</string>
+    <string name="map_sharing_off">Share my location</string>
+    <string name="map_permission_denied">Enable location access in Settings to share.</string>
+    <string name="map_off_unless_on">Off unless you turn it on.</string>
+
+    <!-- Profile editor -->
+    <string name="profile_title">Edit profile</string>
+    <string name="profile_section">PROFILE</string>
+    <string name="profile_your_name">Your name</string>
+    <string name="profile_email">Email · %1$s</string>
+    <string name="profile_save">Save</string>
+    <string name="profile_saved">Saved</string>
+    <string name="profile_add_photo">Add a photo</string>
+    <string name="profile_change_photo">Change photo</string>
+    <string name="profile_remove_photo">Remove photo</string>
+    <string name="profile_i_have_a_cycle">I have a menstrual cycle</string>
+    <string name="profile_cycle_footer">Off if you\'re supporting a partner who has one.</string>
+
+    <!-- Cycle detail -->
+    <string name="cycle_title">Cycle</string>
+    <string name="cycle_health_connect_pending">Connect Health Connect to see your phase, cycle day and next-period estimate. That link is coming to the Android app shortly.</string>
+    <string name="cycle_privacy_note">Only the coarse summary you choose is ever shared — never raw symptoms.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_title">Add the widget</string>
+    <string name="widget_coming_soon_body">Leyla\'s home-screen widget — your distance and a shortcut to \"I miss you\" — is being built for Android. It is already on iPhone; this button will walk you through adding it as soon as it ships here.</string>
+
     <!-- Placeholder tabs -->
     <string name="coming_soon">Coming soon</string>
     <string name="games_blurb">Quizzes, debates and little games to play together.</string>

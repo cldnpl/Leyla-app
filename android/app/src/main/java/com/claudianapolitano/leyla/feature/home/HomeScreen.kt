@@ -62,12 +62,16 @@ import com.claudianapolitano.leyla.feature.cycle.SelfCycleCard
 /**
  * Home: hero → map → cycle. Port of `Us/Features/Home/HomeView.swift`.
  *
- * The navigation destinations it reaches (profile editor, add-widget guide,
- * full map, cycle detail) are not ported yet, so [onNavigate] is where those
- * will hang; the layout, copy and behaviour above it are final.
+ * The destinations it reaches live in [com.claudianapolitano.leyla.feature.home.HomeTab],
+ * which owns the stack — this screen only says which one was asked for, the way
+ * the SwiftUI `NavigationLink`s do.
  */
 @Composable
 fun HomeScreen(
+    onAddWidget: () -> Unit,
+    onEditProfile: () -> Unit,
+    onOpenMap: () -> Unit,
+    onOpenCycle: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
@@ -79,11 +83,8 @@ fun HomeScreen(
 
     Box(modifier.fillMaxSize().background(colors.background)) {
         Column(Modifier.fillMaxSize()) {
-            HomeTopBar(
-                onAddWidget = viewModel::onAddWidget,
-                onEditProfile = viewModel::onEditProfile,
-            )
-            HomeContent(state, viewModel)
+            HomeTopBar(onAddWidget = onAddWidget, onEditProfile = onEditProfile)
+            HomeContent(state, viewModel, onOpenMap = onOpenMap, onOpenCycle = onOpenCycle)
         }
     }
 }
@@ -122,7 +123,12 @@ private fun HomeTopBar(onAddWidget: () -> Unit, onEditProfile: () -> Unit) {
 }
 
 @Composable
-private fun HomeContent(state: HomeUiState, viewModel: HomeViewModel) {
+private fun HomeContent(
+    state: HomeUiState,
+    viewModel: HomeViewModel,
+    onOpenMap: () -> Unit,
+    onOpenCycle: () -> Unit,
+) {
     val colors = LeylaTheme.colors
     Column(
         modifier = Modifier
@@ -141,9 +147,9 @@ private fun HomeContent(state: HomeUiState, viewModel: HomeViewModel) {
             modifier = Modifier.padding(top = 28.dp),
         )
 
-        MapSection(state, onOpenMap = viewModel::onOpenMap)
+        MapSection(state, onOpenMap = onOpenMap)
 
-        CycleSection(state, onOpenCycle = viewModel::onOpenCycle)
+        CycleSection(state, onOpenCycle = onOpenCycle)
 
         state.errorMessage?.let { message ->
             Text(

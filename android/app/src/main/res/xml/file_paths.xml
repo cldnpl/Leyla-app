@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Where Snap Hunt drops the shot the camera app just took. Inside
+         cache/, so the OS reclaims it on its own once the upload is done. -->
+    <cache-path name="captures" path="captures/" />
+</paths>

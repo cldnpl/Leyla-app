@@ -1,6 +1,7 @@
 package com.claudianapolitano.leyla.feature.cycle
 
 import com.claudianapolitano.leyla.core.LeylaApi
+import com.claudianapolitano.leyla.core.Session
 import com.claudianapolitano.leyla.core.PartnerCycle
 import com.claudianapolitano.leyla.core.PartnerPregnancy
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +39,26 @@ object CycleState {
     suspend fun refreshOnAppear() {
         val partner = runCatching { LeylaApi.partnerCycle() }.getOrNull()
         val pregnancy = runCatching { LeylaApi.partnerPregnancy() }.getOrNull()
-        _snapshot.update { it.copy(partner = partner, partnerPregnancy = pregnancy) }
+        _snapshot.update {
+            it.copy(
+                partner = partner,
+                partnerPregnancy = pregnancy,
+                // The answer lives on the account, so a reinstall or a second
+                // device picks it up rather than asking again.
+                userHasCycle = Session.current.user?.hasCycle ?: it.userHasCycle,
+            )
+        }
+    }
+
+    /**
+     * Answers the "do you have a cycle?" question. Held locally straight away so
+     * the Home card switches immediately, then persisted to the account.
+     */
+    suspend fun setUserHasCycle(hasCycle: Boolean) {
+        _snapshot.update { it.copy(userHasCycle = hasCycle) }
+        runCatching { LeylaApi.updateCycleSettings(hasCycle = hasCycle) }
+            .getOrNull()
+            ?.let(Session::updateUser)
     }
 }
 
