@@ -24,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,6 +33,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.BuildConfig
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.core.Coordinate
 import com.claudianapolitano.leyla.core.LeylaApi
 import com.claudianapolitano.leyla.core.LocationRepository
@@ -197,7 +197,7 @@ fun PartnerMapScreen(
             // Without a key the Maps SDK renders a grey tile grid; say why
             // instead, exactly as the Home mini map does.
             Text(
-                stringResource(R.string.maps_key_missing),
+                leylaString(R.string.maps_key_missing),
                 style = IOSText.footnote,
                 color = colors.secondary,
                 textAlign = TextAlign.Center,
@@ -315,7 +315,7 @@ private fun ControlCard(
         ) {
             state.km?.let { km ->
                 Text(
-                    stringResource(R.string.distance_km_apart, Math.round(km).toInt()),
+                    leylaString(R.string.distance_km_apart, Math.round(km).toInt()),
                     style = IOSText.headline,
                     color = Theme.rose,
                 )
@@ -323,9 +323,9 @@ private fun ControlCard(
 
             Text(
                 if (state.partnerSharing) {
-                    stringResource(R.string.map_partner_sharing, state.partnerName)
+                    leylaString(R.string.map_partner_sharing, state.partnerName)
                 } else {
-                    stringResource(R.string.map_partner_not_sharing, state.partnerName)
+                    leylaString(R.string.map_partner_not_sharing, state.partnerName)
                 },
                 style = IOSText.subheadline,
                 color = if (state.partnerSharing) colors.ink else colors.secondary,
@@ -334,7 +334,7 @@ private fun ControlCard(
 
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    stringResource(
+                    leylaString(
                         if (state.isSharing) R.string.map_sharing_on else R.string.map_sharing_off,
                     ),
                     style = IOSText.body,
@@ -350,7 +350,7 @@ private fun ControlCard(
 
             if (state.permissionDenied) {
                 Text(
-                    stringResource(R.string.map_permission_denied),
+                    leylaString(R.string.map_permission_denied),
                     style = IOSText.caption,
                     color = Theme.coral,
                     textAlign = TextAlign.Center,
@@ -358,7 +358,7 @@ private fun ControlCard(
             }
 
             Text(
-                stringResource(R.string.map_off_unless_on),
+                leylaString(R.string.map_off_unless_on),
                 style = IOSText.caption2,
                 color = colors.secondary,
                 textAlign = TextAlign.Center,

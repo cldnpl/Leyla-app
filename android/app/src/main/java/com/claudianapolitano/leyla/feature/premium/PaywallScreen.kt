@@ -56,11 +56,10 @@ sealed interface PaywallTrigger {
  * The Leyla Premium paywall, shown whenever someone taps a locked quiz pack or
  * game. Port of `PaywallView.swift`.
  *
- * iOS animates an iPhone playing through what's behind the lock; that mockup is
- * not ported yet, so the perks carry the pitch on their own. The purchase
- * button is wired to [PremiumStore], which is waiting on Play Billing — until
- * that lands it reports the store as unavailable rather than pretending to
- * charge anyone.
+ * An animated phone plays through what's behind the lock, then the perks, then
+ * one price. The purchase button is wired to [PremiumStore], which is waiting on
+ * Play Billing — until that lands it reports the store as unavailable rather
+ * than pretending to charge anyone.
  */
 @Composable
 fun PaywallScreen(
@@ -104,6 +103,8 @@ fun PaywallScreen(
                     textAlign = TextAlign.Center,
                 )
             }
+
+            PaywallPhone()
 
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Perk(

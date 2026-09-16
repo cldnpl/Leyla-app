@@ -20,12 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.core.PartnerCycle
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaCard
@@ -41,24 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
  * kind of data from Health Connect, so the badge says that instead — the only
  * copy that intentionally differs from iOS.
  */
-@Composable
-private fun HealthSourceBadge(modifier: Modifier = Modifier) {
-    val label = stringResource(R.string.health_source)
-    val accessibility = stringResource(R.string.health_source_accessibility)
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = modifier
-            .background(HealthRed.copy(alpha = 0.10f), CircleShape)
-            .padding(horizontal = 10.dp, vertical = 4.dp)
-            .semantics { contentDescription = accessibility },
-    ) {
-        Icon(Icons.Filled.MonitorHeart, contentDescription = null, tint = HealthRed, modifier = Modifier.size(14.dp))
-        Text(label, style = IOSText.caption.weight(FontWeight.SemiBold), color = HealthRed)
-    }
-}
-
-private val HealthRed = Color(0xFFE5484D)
+internal val HealthRed = Color(0xFFE5484D)
 
 /**
  * The shared body of every cycle card: a leading glyph, a title, a subtitle,
@@ -106,18 +89,18 @@ private fun CycleCardRow(
 @Composable
 fun SelfCycleCard(insights: CycleInsights, modifier: Modifier = Modifier) {
     val nextPeriod = when (insights.daysUntilNextPeriod) {
-        0 -> stringResource(R.string.cycle_next_today)
-        1 -> stringResource(R.string.cycle_next_tomorrow)
-        else -> stringResource(R.string.cycle_next_in_days, insights.daysUntilNextPeriod)
+        0 -> leylaString(R.string.cycle_next_today)
+        1 -> leylaString(R.string.cycle_next_tomorrow)
+        else -> leylaString(R.string.cycle_next_in_days, insights.daysUntilNextPeriod)
     }
     LeylaCard(modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            HealthSourceBadge()
+            HealthConnectBadge()
             CycleCardRow(
                 icon = insights.phase.icon,
                 iconTint = insights.phase.color,
-                title = stringResource(insights.phase.titleRes),
-                subtitle = stringResource(R.string.cycle_self_subtitle, insights.cycleDay, nextPeriod),
+                title = leylaString(insights.phase.titleRes),
+                subtitle = leylaString(R.string.cycle_self_subtitle, insights.cycleDay, nextPeriod),
             )
         }
     }
@@ -132,21 +115,21 @@ fun PartnerPeriodCard(partner: PartnerCycle?, partnerName: String, modifier: Mod
     val phase = partner?.takeIf { it.sharing }?.let { CyclePhase.from(it.phase) }
     LeylaCard(modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            HealthSourceBadge()
+            HealthConnectBadge()
             if (phase != null) {
                 CycleCardRow(
                     icon = phase.icon,
                     iconTint = phase.color,
-                    title = stringResource(R.string.cycle_partner_title, partnerName, stringResource(phase.titleRes)),
-                    subtitle = stringResource(phase.firstPartnerTipRes),
+                    title = leylaString(R.string.cycle_partner_title, partnerName, leylaString(phase.titleRes)),
+                    subtitle = leylaString(phase.partnerTipsRes.first()),
                     subtitleMaxLines = 2,
                 )
             } else {
                 CycleCardRow(
                     icon = Icons.Filled.MonitorHeart,
                     iconTint = Theme.rose,
-                    title = stringResource(R.string.cycle_partner_prompt_title, partnerName),
-                    subtitle = stringResource(R.string.cycle_partner_prompt_body),
+                    title = leylaString(R.string.cycle_partner_prompt_title, partnerName),
+                    subtitle = leylaString(R.string.cycle_partner_prompt_body),
                     subtitleMaxLines = 2,
                 )
             }
@@ -162,12 +145,12 @@ fun PartnerPeriodCard(partner: PartnerCycle?, partnerName: String, modifier: Mod
 fun CycleSetupCard(modifier: Modifier = Modifier) {
     LeylaCard(modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            HealthSourceBadge()
+            HealthConnectBadge()
             CycleCardRow(
                 icon = Icons.Filled.MonitorHeart,
                 iconTint = Theme.rose,
-                title = stringResource(R.string.cycle_setup_title),
-                subtitle = stringResource(R.string.cycle_setup_body),
+                title = leylaString(R.string.cycle_setup_title),
+                subtitle = leylaString(R.string.cycle_setup_body),
             )
         }
     }
@@ -177,9 +160,9 @@ fun CycleSetupCard(modifier: Modifier = Modifier) {
 @Composable
 fun PregnancyHomeCard(insights: PregnancyInsights, title: String, modifier: Modifier = Modifier) {
     val subtitle = if (insights.daysToDue <= 0) {
-        stringResource(R.string.pregnancy_week_due_any_day, insights.week)
+        leylaString(R.string.pregnancy_week_due_any_day, insights.week)
     } else {
-        stringResource(R.string.pregnancy_week_days_to_go, insights.week, insights.daysToDue)
+        leylaString(R.string.pregnancy_week_days_to_go, insights.week, insights.daysToDue)
     }
     LeylaCard(modifier) {
         CycleCardRow(

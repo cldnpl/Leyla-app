@@ -156,6 +156,21 @@ object Session {
         _snapshot.update { it.copy(user = user) }
     }
 
+    /**
+     * Changes how the app refers to the partner. Stored on the account so a
+     * reinstall keeps it, and cached locally so the UI switches at once.
+     */
+    suspend fun setPartnerPronoun(pronoun: PartnerPronoun) {
+        PartnerPrefs.pronoun = pronoun
+        runCatching { LeylaApi.updatePartnerPronoun(pronoun.wire) }.getOrNull()?.let(::updateUser)
+    }
+
+    /** Saves the day the relationship started, which Home counts from. */
+    suspend fun saveStartDate(isoDay: String) {
+        val couple = runCatching { LeylaApi.updateCoupleStartDate(isoDay) }.getOrNull() ?: return
+        _snapshot.update { it.copy(couple = couple.couple ?: it.couple) }
+    }
+
     fun noteRemoteChange() {
         _snapshot.update { it.copy(remoteChangeId = it.remoteChangeId + 1) }
     }

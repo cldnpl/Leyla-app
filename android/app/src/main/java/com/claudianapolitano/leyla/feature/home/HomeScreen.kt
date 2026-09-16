@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.designsystem.BrandLogo
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
@@ -114,7 +114,7 @@ private fun HomeTopBar(onAddWidget: () -> Unit, onEditProfile: () -> Unit) {
         ) {
             Icon(
                 Icons.Filled.AccountCircle,
-                contentDescription = stringResource(R.string.edit_profile),
+                contentDescription = leylaString(R.string.edit_profile),
                 tint = colors.ink,
                 modifier = Modifier.size(28.dp),
             )
@@ -139,7 +139,7 @@ private fun HomeContent(
         verticalArrangement = Arrangement.spacedBy(18.dp),
     ) {
         HeroButton(
-            title = stringResource(state.heroTitleRes, state.partnerName),
+            title = leylaString(state.heroTitleRes, state.partnerName),
             partnerName = state.partnerName,
             isSent = state.missYouSent,
             isSending = state.isSending,
@@ -174,9 +174,9 @@ private fun HeroButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val sentLabel = stringResource(R.string.hero_sent)
-    val sentAccessibility = stringResource(R.string.hero_sent_accessibility)
-    val sendAccessibility = stringResource(R.string.hero_send_accessibility, partnerName)
+    val sentLabel = leylaString(R.string.hero_sent)
+    val sentAccessibility = leylaString(R.string.hero_sent_accessibility)
+    val sendAccessibility = leylaString(R.string.hero_send_accessibility, partnerName)
     val enabled = !isSending && !isSent
 
     Box(
@@ -237,7 +237,7 @@ private fun AddWidgetPill(onClick: () -> Unit, modifier: Modifier = Modifier) {
     ) {
         Icon(Icons.Filled.Add, contentDescription = null, tint = Theme.rose, modifier = Modifier.size(14.dp))
         Text(
-            stringResource(R.string.add_widget),
+            leylaString(R.string.add_widget),
             style = IOSText.footnote.weight(FontWeight.SemiBold),
             color = Theme.rose,
         )
@@ -281,9 +281,9 @@ private fun ShareLocationCard(partnerName: String, onClick: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Icon(Icons.Filled.Map, contentDescription = null, tint = Theme.rose, modifier = Modifier.size(28.dp))
-            Text(stringResource(R.string.map_see_each_other), style = IOSText.headline, color = colors.ink)
+            Text(leylaString(R.string.map_see_each_other), style = IOSText.headline, color = colors.ink)
             Text(
-                stringResource(R.string.map_turn_on_location, partnerName),
+                leylaString(R.string.map_turn_on_location, partnerName),
                 style = IOSText.footnote,
                 color = colors.secondary,
                 textAlign = TextAlign.Center,
@@ -307,7 +307,7 @@ private fun CycleSection(state: HomeUiState, onOpenCycle: () -> Unit) {
         cycle.userHasCycle == true && cycle.isPregnant && cycle.pregnancyInsights != null ->
             PregnancyHomeCard(
                 insights = cycle.pregnancyInsights,
-                title = stringResource(R.string.pregnancy_yours),
+                title = leylaString(R.string.pregnancy_yours),
                 modifier = clickable,
             )
 
@@ -315,7 +315,7 @@ private fun CycleSection(state: HomeUiState, onOpenCycle: () -> Unit) {
         cycle.userHasCycle == false && state.partnerPregnancyInsights != null ->
             PregnancyHomeCard(
                 insights = state.partnerPregnancyInsights,
-                title = stringResource(R.string.pregnancy_partner_expecting, state.partnerName),
+                title = leylaString(R.string.pregnancy_partner_expecting, state.partnerName),
                 modifier = clickable,
             )
 

@@ -281,7 +281,7 @@ private sealed interface HistoryEntry {
 
 /** "DRAW — <prompt>" header with the countdown above the canvas. */
 @Composable
-private fun DrawPromptHeader(prompt: String, remaining: Int, accent: Color) {
+internal fun DrawPromptHeader(prompt: String, remaining: Int, accent: Color) {
     val minutes = remaining / 60
     val seconds = remaining % 60
     Column(
@@ -327,7 +327,7 @@ private fun DrawPromptHeader(prompt: String, remaining: Int, accent: Color) {
 
 /** Colour palette, brush/fill tools, eraser/undo/clear, and Done. */
 @Composable
-private fun DrawToolbar(
+internal fun DrawToolbar(
     selectedColorId: String,
     brushSize: Float,
     isEraser: Boolean,

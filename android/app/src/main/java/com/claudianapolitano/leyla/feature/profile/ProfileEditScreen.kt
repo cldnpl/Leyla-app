@@ -25,10 +25,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.core.LeylaApi
 import com.claudianapolitano.leyla.core.Session
 import com.claudianapolitano.leyla.designsystem.Avatar
@@ -46,6 +49,7 @@ import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.designsystem.weight
 import com.claudianapolitano.leyla.feature.cycle.CycleState
+import com.claudianapolitano.leyla.feature.together.plainClickable
 import com.claudianapolitano.leyla.feature.together.PrimaryButton
 import com.claudianapolitano.leyla.feature.together.TextAction
 import com.claudianapolitano.leyla.feature.together.errorRed
@@ -160,6 +164,7 @@ fun ProfileEditScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = viewModel(),
 ) {
+    var showEmailChange by remember { mutableStateOf(false) }
     val state by viewModel.state.collectAsStateWithLifecycle()
     val colors = LeylaTheme.colors
     val context = LocalContext.current
@@ -193,7 +198,7 @@ fun ProfileEditScreen(
                 }
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     TextAction(
-                        text = stringResource(
+                        text = leylaString(
                             if (state.avatarPath == null) R.string.profile_add_photo else R.string.profile_change_photo,
                         ),
                         onClick = {
@@ -207,7 +212,7 @@ fun ProfileEditScreen(
                     )
                     if (state.avatarPath != null) {
                         TextAction(
-                            text = stringResource(R.string.profile_remove_photo),
+                            text = leylaString(R.string.profile_remove_photo),
                             onClick = viewModel::removeAvatar,
                             color = colors.secondary,
                             enabled = !state.uploadingAvatar,
@@ -219,14 +224,14 @@ fun ProfileEditScreen(
 
         LeylaCard {
             Text(
-                stringResource(R.string.profile_section),
+                leylaString(R.string.profile_section),
                 style = IOSText.caption.weight(FontWeight.Bold),
                 color = colors.secondary,
             )
             OutlinedTextField(
                 value = state.nameDraft,
                 onValueChange = viewModel::typeName,
-                label = { Text(stringResource(R.string.profile_your_name)) },
+                label = { Text(leylaString(R.string.profile_your_name)) },
                 singleLine = true,
                 keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = ImeAction.Done),
                 colors = TextFieldDefaults.colors(
@@ -237,15 +242,28 @@ fun ProfileEditScreen(
                 modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
             )
             if (state.email != null) {
-                Text(
-                    stringResource(R.string.profile_email, state.email!!),
-                    style = IOSText.footnote,
-                    color = colors.secondary,
-                    modifier = Modifier.padding(top = 10.dp),
-                )
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .plainClickable { showEmailChange = true }
+                        .padding(top = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        leylaString(R.string.profile_email, state.email!!),
+                        style = IOSText.footnote,
+                        color = colors.secondary,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        leylaString(R.string.email_change_action),
+                        style = IOSText.footnote.weight(FontWeight.SemiBold),
+                        color = Theme.coral,
+                    )
+                }
             }
             PrimaryButton(
-                text = stringResource(
+                text = leylaString(
                     if (state.savedNotice) R.string.profile_saved else R.string.profile_save,
                 ),
                 onClick = viewModel::saveName,
@@ -259,12 +277,12 @@ fun ProfileEditScreen(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        stringResource(R.string.profile_i_have_a_cycle),
+                        leylaString(R.string.profile_i_have_a_cycle),
                         style = IOSText.body,
                         color = colors.ink,
                     )
                     Text(
-                        stringResource(R.string.profile_cycle_footer),
+                        leylaString(R.string.profile_cycle_footer),
                         style = IOSText.caption,
                         color = colors.secondary,
                     )
@@ -280,6 +298,10 @@ fun ProfileEditScreen(
         if (state.errorMessage != null) {
             Text(state.errorMessage!!, style = IOSText.footnote, color = errorRed())
         }
+    }
+
+    if (showEmailChange) {
+        ChangeEmailSheet(onDismiss = { showEmailChange = false })
     }
 }
 

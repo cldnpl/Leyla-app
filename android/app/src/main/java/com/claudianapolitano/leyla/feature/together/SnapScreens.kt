@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -53,13 +52,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.core.Session
+import com.claudianapolitano.leyla.core.loadBitmap
+import com.claudianapolitano.leyla.core.newCaptureUri
 import com.claudianapolitano.leyla.core.rememberHaptics
+import com.claudianapolitano.leyla.core.toJpeg
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
@@ -71,7 +72,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.ByteArrayOutputStream
 
 /**
  * Snap Hunt: one clue, both of you race to photograph the cleverest find, and
@@ -332,32 +332,15 @@ private fun SnapHuntCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(22.dp),
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Text(
-                        "FIND",
-                        style = IOSText.caption2.weight(FontWeight.Bold).copy(letterSpacing = 2.sp),
-                        color = accent,
-                    )
-                    Text(
-                        "“${round.clue}”",
-                        style = IOSText.title.weight(FontWeight.Bold),
-                        color = colors.ink,
-                        textAlign = TextAlign.Center,
-                    )
-                    Text(
-                        when {
-                            round.partnerSubmitted -> "${state.partnerName} already found theirs — quick!"
-                            round.startedByMe -> "Race around the house and snap your cleverest find."
-                            else -> "${state.partnerName} started this hunt — join them!"
-                        },
-                        style = IOSText.subheadline,
-                        color = colors.secondary,
-                        textAlign = TextAlign.Center,
-                    )
-                }
+                SnapClueHeader(
+                    clue = round.clue,
+                    subtitle = when {
+                        round.partnerSubmitted -> "${state.partnerName} already found theirs — quick!"
+                        round.startedByMe -> "Race around the house and snap your cleverest find."
+                        else -> "${state.partnerName} started this hunt — join them!"
+                    },
+                    accent = accent,
+                )
 
                 if (picked != null) {
                     androidx.compose.foundation.Image(
@@ -379,24 +362,7 @@ private fun SnapHuntCard(
                     )
                     TextAction("Retake", onRetake, icon = Icons.Filled.CameraAlt, color = accent)
                 } else {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(24.dp))
-                            .background(QuizPalette.gradient("green", alpha = 0.4f))
-                            .plainClickable(onClick = onSnap)
-                            .padding(vertical = 36.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        Icon(
-                            Icons.Filled.CameraAlt,
-                            contentDescription = null,
-                            tint = accent,
-                            modifier = Modifier.size(44.dp),
-                        )
-                        Text("Snap a photo", style = IOSText.headline, color = accent)
-                    }
+                    SnapCameraTarget(accent = accent, onClick = onSnap)
                 }
 
                 if (state.errorMessage != null) {
@@ -557,36 +523,44 @@ private fun crownTitle(outcome: String?, partnerName: String): String = when (ou
     else -> "It's a tie — both brilliant! 🤝"
 }
 
-// MARK: - Image plumbing
-
-/** Compresses the picked shot the way the iOS client does before uploading. */
-private fun Bitmap.toJpeg(quality: Int = 85): ByteArray =
-    ByteArrayOutputStream().use { out ->
-        compress(Bitmap.CompressFormat.JPEG, quality, out)
-        out.toByteArray()
+/** The clue at the top of a hunt. Shared with the paywall's demo phone. */
+@Composable
+internal fun SnapClueHeader(clue: String, subtitle: String, accent: Color, modifier: Modifier = Modifier) {
+    val colors = LeylaTheme.colors
+    Column(
+        modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            "FIND",
+            style = IOSText.caption2.weight(FontWeight.Bold).copy(letterSpacing = 2.sp),
+            color = accent,
+        )
+        Text(
+            "\u201C$clue\u201D",
+            style = IOSText.title.weight(FontWeight.Bold),
+            color = colors.ink,
+            textAlign = TextAlign.Center,
+        )
+        Text(subtitle, style = IOSText.subheadline, color = colors.secondary, textAlign = TextAlign.Center)
     }
+}
 
-/**
- * A fresh file in the app's cache for the camera to write into, exposed through
- * the manifest's FileProvider. Null only if the cache directory is unavailable.
- */
-private fun Context.newCaptureUri(): Uri? = runCatching {
-    val dir = java.io.File(cacheDir, "captures").apply { mkdirs() }
-    val file = java.io.File(dir, "snap-${System.currentTimeMillis()}.jpg")
-    FileProvider.getUriForFile(this, "$packageName.fileprovider", file)
-}.getOrNull()
-
-/**
- * Decodes a picked or captured photo, downsampled so a 12-megapixel shot
- * doesn't have to be held in memory whole just to become a ~1600px upload.
- */
-private fun Context.loadBitmap(uri: Uri, maxDimension: Int = 1600): Bitmap? = runCatching {
-    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-    contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, bounds) }
-    var sample = 1
-    while (bounds.outWidth / sample > maxDimension || bounds.outHeight / sample > maxDimension) {
-        sample *= 2
+/** The big "snap a photo" target. Shared with the paywall's demo phone. */
+@Composable
+internal fun SnapCameraTarget(accent: Color, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(24.dp))
+            .background(QuizPalette.gradient("green", alpha = 0.4f))
+            .plainClickable(onClick = onClick)
+            .padding(vertical = 36.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Icon(Icons.Filled.CameraAlt, contentDescription = null, tint = accent, modifier = Modifier.size(44.dp))
+        Text("Snap a photo", style = IOSText.headline, color = accent)
     }
-    val options = BitmapFactory.Options().apply { inSampleSize = sample }
-    contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it, null, options) }
-}.getOrNull()
+}

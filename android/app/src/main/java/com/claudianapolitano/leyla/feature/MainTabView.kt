@@ -17,23 +17,33 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.designsystem.IOSText
+import com.claudianapolitano.leyla.core.Session
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.feature.home.HomeTab
+import com.claudianapolitano.leyla.feature.journal.JournalScreen
+import com.claudianapolitano.leyla.feature.onboarding.SetupFlow
+import com.claudianapolitano.leyla.feature.onboarding.SetupFlowScreen
+import com.claudianapolitano.leyla.feature.settings.SettingsTab
 import com.claudianapolitano.leyla.feature.placeholder.ComingSoonScreen
 import com.claudianapolitano.leyla.feature.together.GamesTab
 
@@ -53,12 +63,28 @@ enum class Tab(
  * The app shell: four tabs over the warm backdrop. Port of
  * `Us/Features/MainTabView.swift`.
  *
- * iOS presents the post-pairing setup flow and the notifications primer as
- * full-screen covers from here; both land with their own screens.
+ * iOS presents the post-pairing setup flow as a full-screen cover from here,
+ * and the notifications primer right after it. The primer is still waiting on
+ * push, so only the setup flow runs.
  */
 @Composable
 fun MainTabView(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
+    val session by Session.snapshot.collectAsStateWithLifecycle()
+
+    // First run after pairing: pick the partner's pronoun and the day it began.
+    // Re-checked when the couple arrives, because pairing and this screen race
+    // — the couple often lands a moment after the tabs are already up.
+    var showSetup by remember { mutableStateOf(false) }
+    LaunchedEffect(session.couple?.id, session.couple?.startDate) {
+        if (SetupFlow.isNeeded()) showSetup = true
+    }
+
+    if (showSetup) {
+        SetupFlowScreen(onDone = { showSetup = false }, modifier = modifier)
+        return
+    }
+
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
     val colors = LeylaTheme.colors
@@ -87,7 +113,7 @@ fun MainTabView(modifier: Modifier = Modifier) {
                             }
                         },
                         icon = { Icon(tab.icon, contentDescription = null) },
-                        label = { Text(stringResource(tab.titleRes), style = IOSText.caption2) },
+                        label = { Text(leylaString(tab.titleRes), style = IOSText.caption2) },
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Theme.rose,
                             selectedTextColor = Theme.rose,
@@ -115,10 +141,10 @@ fun MainTabView(modifier: Modifier = Modifier) {
                 // NavigationStack — so those pushes stay under the tab bar.
                 composable(Tab.GAMES.route) { GamesTab() }
                 composable(Tab.JOURNAL.route) {
-                    ComingSoonScreen(Tab.JOURNAL.titleRes, Icons.AutoMirrored.Filled.MenuBook, R.string.journal_blurb)
+                    JournalScreen()
                 }
                 composable(Tab.SETTINGS.route) {
-                    ComingSoonScreen(Tab.SETTINGS.titleRes, Icons.Filled.Settings, R.string.settings_blurb)
+                    SettingsTab()
                 }
             }
         }
