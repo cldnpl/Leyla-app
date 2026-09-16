@@ -88,5 +88,18 @@
                 <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
             </intent-filter>
         </activity-alias>
+
+        <!-- The home-screen widget: days together, distance, and a heart that
+             sends "I miss you" without opening the app. -->
+        <receiver
+            android:name=".widget.LeylaWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_leyla_info" />
+        </receiver>
     </application>
 </manifest>

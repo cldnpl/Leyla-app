@@ -348,4 +348,20 @@
     <string name="email_send_new_code">Send a new code</string>
     <string name="email_check_inbox">Check your inbox. The code expires in 15 minutes.</string>
     <string name="email_dev_code">Dev server: no email configured. Your code is %1$s.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_description">Days together, how far apart you are, and a heart that says “I miss you”.</string>
+    <string name="widget_days_together">days together</string>
+    <string name="widget_km_apart">%1$d km apart</string>
+    <string name="widget_no_distance">Not sharing location</string>
+    <string name="widget_miss_you_action">Send “I miss you”</string>
+    <string name="widget_dash">—</string>
+    <string name="widget_add_for_me">Add it to my home screen</string>
+    <string name="widget_check_home">Check your home screen</string>
+    <string name="widget_or_by_hand">Or add it yourself</string>
+    <string name="widget_step_1">Touch and hold an empty spot on your home screen.</string>
+    <string name="widget_step_2">Tap <b>Widgets</b>.</string>
+    <string name="widget_step_3">Scroll to <b>Leyla</b> and open it.</string>
+    <string name="widget_step_4">Touch and hold the widget, then drag it where you want it.</string>
+    <string name="widget_heart_note">Tapping the heart sends “I miss you” to %1$s — without opening the app.</string>
 </resources>

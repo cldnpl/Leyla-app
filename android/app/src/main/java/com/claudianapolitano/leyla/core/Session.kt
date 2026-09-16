@@ -89,6 +89,7 @@ object Session {
                 _snapshot.update {
                     it.copy(state = State.READY, partner = couple.partner, couple = couple.couple)
                 }
+                publishCouple()
                 return
             }
             if (restoreTestPairingIfNeeded()) return
@@ -105,6 +106,8 @@ object Session {
         TokenStore.refreshToken?.let { rt -> runCatching { LeylaApi.logout(rt) } }
         TokenStore.clear()
         AppPrefs.clearAccountState()
+        // The next account on this phone must not inherit this couple's widget.
+        WidgetStore.clear()
         _snapshot.value = Snapshot(state = State.SIGNED_OUT)
     }
 
@@ -169,18 +172,30 @@ object Session {
     suspend fun saveStartDate(isoDay: String) {
         val couple = runCatching { LeylaApi.updateCoupleStartDate(isoDay) }.getOrNull() ?: return
         _snapshot.update { it.copy(couple = couple.couple ?: it.couple) }
+        publishCouple()
     }
 
     fun noteRemoteChange() {
         _snapshot.update { it.copy(remoteChangeId = it.remoteChangeId + 1) }
     }
 
-    /**
-     * Keeps the distance widget in sync with what the Home map shows. The
-     * widget itself is not ported yet, so this is where that wiring will hang.
-     */
+    /** Keeps the home-screen widget in sync with what the Home map shows. */
     fun publishDistance(km: Double?) {
         lastPublishedKm = km
+        WidgetStore.saveDistance(km)
+    }
+
+    /**
+     * Hands the widget the names and the start date. Called wherever the couple
+     * changes, because the widget renders from this and nothing else.
+     */
+    private fun publishCouple() {
+        val snapshot = _snapshot.value
+        WidgetStore.saveCouple(
+            myName = snapshot.user?.displayName,
+            partnerName = snapshot.partner?.displayName,
+            startDate = snapshot.couple?.startDate,
+        )
     }
 
     @Volatile
