@@ -7,14 +7,26 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
-// Google Maps needs an API key, and a key does not belong in git. Put
-//   MAPS_API_KEY=AIza...
-// in android/local.properties (already gitignored). Without it the map card
-// falls back to a static panel instead of rendering a grey tile grid.
-val mapsApiKey: String = Properties().apply {
+// Secrets do not belong in git, so they come from android/local.properties
+// (already gitignored) rather than from this file.
+private val localProps: Properties = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) f.inputStream().use { load(it) }
-}.getProperty("MAPS_API_KEY") ?: ""
+}
+
+// Google Maps needs an API key. Put
+//   MAPS_API_KEY=AIza...
+// in local.properties. Without it the map card falls back to a static panel
+// instead of rendering a grey tile grid.
+val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY") ?: ""
+
+// Google sign-in sends an ID token minted for the *web* OAuth client, not the
+// Android one — that is what Credential Manager's serverClientId means and what
+// the backend checks against GOOGLE_CLIENT_IDS. Put
+//   GOOGLE_WEB_CLIENT_ID=....apps.googleusercontent.com
+// in android/local.properties. Empty hides the button rather than offering a
+// sign-in that cannot complete.
+val googleWebClientId: String = localProps.getProperty("GOOGLE_WEB_CLIENT_ID") ?: ""
 
 android {
     namespace = "com.claudianapolitano.leyla"
@@ -29,6 +41,7 @@ android {
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
     }
 
     buildTypes {
@@ -88,5 +101,13 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.androidx.security.crypto)
 
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
+
+    implementation(libs.androidx.health.connect)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
+
+    testImplementation(libs.junit)
 }

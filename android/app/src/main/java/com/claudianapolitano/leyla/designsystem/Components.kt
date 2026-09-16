@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -35,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.core.ApiConfig
 
 /**
@@ -90,7 +90,7 @@ fun LeylaCard(
  */
 @Composable
 fun BrandLogo(modifier: Modifier = Modifier, color: Color = Theme.rose) {
-    val description = stringResource(R.string.leyla_logo_description)
+    val description = leylaString(R.string.leyla_logo_description)
     Image(
         painter = painterResource(R.drawable.leyla_logo),
         contentDescription = description,

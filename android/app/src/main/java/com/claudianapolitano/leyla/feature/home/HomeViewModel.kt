@@ -95,7 +95,7 @@ class HomeViewModel : ViewModel() {
         LocationRepository.init(context)
         LocationRepository.refresh(context)
         viewModelScope.launch { loadPartnerLocation() }
-        viewModelScope.launch { CycleState.refreshOnAppear() }
+        viewModelScope.launch { CycleState.refreshOnAppear(context) }
         startPolling()
     }
 

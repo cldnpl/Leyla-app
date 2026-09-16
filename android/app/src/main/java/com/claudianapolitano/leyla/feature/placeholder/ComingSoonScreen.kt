@@ -15,11 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
@@ -40,15 +40,15 @@ fun ComingSoonScreen(
         verticalArrangement = Arrangement.spacedBy(14.dp, Alignment.CenterVertically),
     ) {
         Icon(icon, contentDescription = null, tint = Theme.coral, modifier = Modifier.size(52.dp))
-        Text(stringResource(titleRes), style = IOSText.title.weight(FontWeight.Bold), color = colors.ink)
+        Text(leylaString(titleRes), style = IOSText.title.weight(FontWeight.Bold), color = colors.ink)
         Text(
-            stringResource(blurbRes),
+            leylaString(blurbRes),
             style = IOSText.subheadline,
             color = colors.secondary,
             textAlign = TextAlign.Center,
         )
         Text(
-            stringResource(R.string.coming_soon),
+            leylaString(R.string.coming_soon),
             style = IOSText.caption.weight(FontWeight.Bold),
             color = Theme.coral,
             modifier = Modifier

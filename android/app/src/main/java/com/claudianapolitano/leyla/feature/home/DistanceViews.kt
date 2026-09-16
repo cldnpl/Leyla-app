@@ -24,13 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.core.Coordinate
 import com.claudianapolitano.leyla.designsystem.Avatar
 import com.claudianapolitano.leyla.designsystem.IOSText
@@ -96,9 +96,9 @@ fun DistanceMapCard(
 fun DistanceConnector(myName: String, partnerName: String, km: Double, modifier: Modifier = Modifier) {
     val colors = LeylaTheme.colors
     val distanceText = if (km < 1) {
-        stringResource(R.string.distance_less_than_km)
+        leylaString(R.string.distance_less_than_km)
     } else {
-        stringResource(R.string.distance_km_apart, km.roundToInt())
+        leylaString(R.string.distance_km_apart, km.roundToInt())
     }
     Column(
         modifier = modifier.fillMaxWidth(),

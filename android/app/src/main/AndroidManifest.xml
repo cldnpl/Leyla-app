@@ -8,8 +8,28 @@
     <!-- Snap Hunt photographs the clue. The camera is optional: a device
          without one falls back to the photo picker, so it must not narrow
          Play Store availability. -->
+    <!-- Android 13+ will not show a notification without this being granted. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!-- Health Connect, read-only. Leyla never writes a health record and never
+         uploads one: the cycle is derived on the phone, and only the coarse
+         summary the user picks is shared with her partner. -->
+    <uses-permission android:name="android.permission.health.READ_MENSTRUATION" />
+
+    <!-- Without this, Android 15+ hands back only the last 30 days, which is
+         rarely even two cycles — not enough to average a cycle length from.
+         iOS reads 12 months, so ask for the history to match. Optional: a
+         refusal still leaves 30 days, and the cycle just stays an estimate. -->
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY" />
+
+    <!-- Health Connect ships inside Android 14+; on older releases it is an app.
+         Without this query the client cannot see whether the provider exists. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
 
     <application
         android:name=".LeylaApplication"
@@ -48,6 +68,25 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Android 14+ asks the app to justify the permission from inside
+                 the Health Connect settings screen. Both actions land on the
+                 same activity, which routes to the rationale. -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
         </activity>
+
+        <!-- Pre-14 Health Connect looks for the rationale under this alias. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
     </application>
 </manifest>

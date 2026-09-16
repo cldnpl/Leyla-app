@@ -92,7 +92,7 @@
     <!-- Cycle detail -->
     <string name="cycle_title">Cycle</string>
     <string name="cycle_health_connect_pending">Connect Health Connect to see your phase, cycle day and next-period estimate. That link is coming to the Android app shortly.</string>
-    <string name="cycle_privacy_note">Only the coarse summary you choose is ever shared — never raw symptoms.</string>
+    <string name="cycle_privacy_note">Cycle predictions are estimates, not medical advice. Leyla reads menstrual cycle data from Health Connect only with your permission, never writes to it, and never uploads it.</string>
 
     <!-- Home-screen widget -->
     <string name="widget_title">Add the widget</string>
@@ -103,4 +103,249 @@
     <string name="games_blurb">Quizzes, debates and little games to play together.</string>
     <string name="journal_blurb">Your shared diary — words and photos, day by day.</string>
     <string name="settings_blurb">Your account, your partner, and how Leyla behaves.</string>
+
+    <!-- Cycle: Health Connect identification (kept in step with iOS's Apple Health copy) -->
+    <string name="back">Back</string>
+    <string name="cancel">Cancel</string>
+    <string name="health_connected">Connected</string>
+    <string name="health_not_connected">Not connected</string>
+    <string name="health_connected_detail">Connected — your cycle is read from Health Connect</string>
+    <string name="health_waiting_for_data">Waiting for data</string>
+    <string name="health_reads_line">Leyla reads your menstrual cycle data from Health Connect, with your permission.</string>
+    <string name="health_other_apps_line">It works with whatever you already track your period in — Health Connect itself, or apps like Flo, Clue or Samsung Health that sync to it.</string>
+    <string name="health_never_writes_line">Leyla never writes to Health Connect and never uploads your health data. Your cycle is calculated on this phone.</string>
+    <string name="health_manage_line">You can review or revoke access anytime in Settings ▸ Security &amp; privacy ▸ Health Connect ▸ App permissions.</string>
+    <string name="health_connect_action">Connect Health Connect</string>
+    <string name="health_check_again">Check Health Connect again</string>
+    <string name="health_open_settings">Open Health Connect</string>
+    <string name="health_source_note">Cycle data comes from Health Connect on this phone.</string>
+    <string name="health_unavailable">Health Connect isn\'t available on this device, so cycle tracking is unavailable.</string>
+    <string name="health_needs_update">Health Connect needs updating on this device before Leyla can read your cycle.</string>
+
+    <!-- Cycle: the question, and the two paths out of it -->
+    <string name="cycle_ask_title">Cycle &amp; health</string>
+    <string name="cycle_ask_body">Track your own cycle, or get tips to support your partner\'s.</string>
+    <string name="cycle_ask_yes">Yes, I have a cycle</string>
+    <string name="cycle_ask_no">No — I want to support %1$s</string>
+    <string name="cycle_your_cycle">Your cycle</string>
+    <string name="cycle_connect_body">Leyla shows your current phase, your cycle day and your next period by reading the cycle you already track in Health Connect — including periods synced there from Flo, Clue or any other app. It stays on this phone until you choose to share a heads-up with %1$s.</string>
+    <string name="cycle_no_data_title">No period logged yet</string>
+    <string name="cycle_no_data_body">Leyla is connected to Health Connect but hasn\'t found a period in the last 12 months. Log one there — or in the app you already use, like Flo or Clue, with Health Connect sharing turned on — and your cycle appears here on its own.</string>
+
+    <!-- Cycle: the ring -->
+    <string name="cycle_ring_day">Day %1$d</string>
+    <string name="cycle_ring_starting">starting %1$s</string>
+    <string name="cycle_ring_one_day_to">1 day to %1$s</string>
+    <string name="cycle_ring_days_to">%1$d days to %2$s</string>
+    <string name="cycle_next_period_summary">Next period %1$s · ~%2$d-day cycle</string>
+
+    <!-- Cycle: thoughts and sharing -->
+    <string name="cycle_todays_thoughts">Today\'s thoughts</string>
+    <string name="cycle_thoughts_placeholder">How are you feeling today? Jot down a thought…</string>
+    <string name="cycle_share_with">Share with %1$s</string>
+    <string name="cycle_share_off">Not sharing</string>
+    <string name="cycle_share_cycle">Cycle only</string>
+    <string name="cycle_share_cycle_thoughts">Cycle + thoughts</string>
+    <string name="cycle_share_off_explain">%1$s sees nothing about your cycle.</string>
+    <string name="cycle_share_cycle_explain">Phase, cycle day, and next-period countdown.</string>
+    <string name="cycle_share_cycle_thoughts_explain">Also the thoughts you write for the day.</string>
+
+    <!-- Cycle: the supporter\'s side -->
+    <string name="cycle_partner_not_sharing">Once %1$s turns on sharing, her phase and support tips appear here.</string>
+    <string name="cycle_supporter_health_note">What you see here comes from the cycle %1$s tracks in Health Connect on her own phone, and only the part she chooses to share. Leyla doesn\'t read any health data from this phone unless you turn on your own cycle tracking.</string>
+    <string name="cycle_partner_period_any_day">Her period may start any day</string>
+    <string name="cycle_partner_period_in_days">Her next period in about %1$d days</string>
+    <string name="cycle_whats_happening">What\'s happening</string>
+    <string name="cycle_what_she_may_feel">What she may feel</string>
+    <string name="cycle_how_to_support">How to support her now</string>
+    <string name="cycle_partner_thoughts">%1$s\'s thoughts today</string>
+
+    <!-- Phase detail lines, shown to the person whose cycle it is -->
+    <string name="phase_detail_menstrual">Your period. Rest and be kind to yourself.</string>
+    <string name="phase_detail_follicular">Rising energy as your body prepares to ovulate.</string>
+    <string name="phase_detail_ovulation">Your fertile window — energy and confidence peak.</string>
+    <string name="phase_detail_luteal">Winding down before your next period.</string>
+
+    <!-- Phase explainers, for the partner who doesn\'t have a cycle -->
+    <string name="phase_about_menstrual">The period itself — the uterine lining sheds. Estrogen and progesterone are at their lowest, so energy and mood often dip.</string>
+    <string name="phase_about_follicular">After the period, estrogen climbs as the body prepares to release an egg. Energy, mood, and motivation rise through this phase.</string>
+    <string name="phase_about_ovulation">Estrogen peaks and an egg is released — the fertile window. Many feel their most confident, social, and energetic.</string>
+    <string name="phase_about_luteal">After ovulation, progesterone rises then falls toward the next period. Energy winds down and PMS can appear in the last few days.</string>
+    <string name="phase_symptoms_menstrual">Cramps, fatigue, low mood, headaches, and cravings are common. Rest matters most now.</string>
+    <string name="phase_symptoms_follicular">Usually the easiest stretch — mostly higher energy. Some notice restlessness or skin changes.</string>
+    <string name="phase_symptoms_ovulation">Peak energy and libido; some feel mild cramping or bloating around release.</string>
+    <string name="phase_symptoms_luteal">Tiredness, mood swings, irritability, bloating, cravings, and tender breasts — strongest just before the period.</string>
+
+    <!-- The rest of each phase\'s partner tips (the first of each is above) -->
+    <string name="phase_tip_menstrual_2">Offer a heating pad and let her rest</string>
+    <string name="phase_tip_menstrual_3">Quietly take chores off her plate</string>
+    <string name="phase_tip_menstrual_4">Be patient — low energy and cramps are normal</string>
+    <string name="phase_tip_follicular_2">Great week for a date or trying something new together</string>
+    <string name="phase_tip_follicular_3">Match her upbeat, motivated mood</string>
+    <string name="phase_tip_ovulation_2">Extra affection and compliments land really well now</string>
+    <string name="phase_tip_ovulation_3">If you\'re trying for a baby, this is the fertile window</string>
+    <string name="phase_tip_luteal_2">Cook or handle dinner</string>
+    <string name="phase_tip_luteal_3">Give extra reassurance, patience, and cuddles</string>
+    <string name="phase_tip_luteal_4">Bring her comfort food or chocolate</string>
+    <string name="phase_tip_luteal_5">Don\'t take small mood shifts personally</string>
+
+    <!-- Pregnancy -->
+    <string name="pregnancy_ring_week">Week %1$d</string>
+    <string name="pregnancy_ring_of_40">of 40</string>
+    <string name="pregnancy_ring_due_any_day">due any day now</string>
+    <string name="pregnancy_ring_days_to_go">%1$d days to go</string>
+    <string name="pregnancy_due_summary">Due %1$s · %2$s</string>
+    <string name="pregnancy_this_week">This week</string>
+    <string name="pregnancy_baby_size">Your baby is about the size of %1$s.</string>
+    <string name="pregnancy_partner_can_see">%1$s can see your progress.</string>
+    <string name="pregnancy_end_tracking">End pregnancy tracking</string>
+    <string name="pregnancy_expecting_title">Expecting a baby?</string>
+    <string name="pregnancy_expecting_body">Switch to pregnancy tracking.</string>
+    <string name="pregnancy_due_date_question">When\'s your due date?</string>
+    <string name="pregnancy_start_tracking">Start tracking</string>
+    <string name="pregnancy_partner_week_size">Week %1$d · the baby is about the size of %2$s.</string>
+    <string name="trimester_first">First trimester</string>
+    <string name="trimester_second">Second trimester</string>
+    <string name="trimester_third">Third trimester</string>
+    <string name="trimester_about_first">The baby\'s major organs are forming. She may feel nausea, deep fatigue, and tender breasts — even though there\'s little to see yet.</string>
+    <string name="trimester_about_second">Often the easiest stretch: energy returns and the bump grows. She may feel the baby move for the first time.</string>
+    <string name="trimester_about_third">The baby grows fast and settles into position. Sleep gets harder, with possible swelling, backache, and practice contractions.</string>
+    <string name="trimester_support_first_1">Be patient with nausea and fatigue</string>
+    <string name="trimester_support_first_2">Handle cooking smells she can\'t stand</string>
+    <string name="trimester_support_first_3">Let her nap and rest without guilt</string>
+    <string name="trimester_support_first_4">Go with her to the first scans</string>
+    <string name="trimester_support_second_1">Plan nice outings while she has energy</string>
+    <string name="trimester_support_second_2">Start prepping the nursery together</string>
+    <string name="trimester_support_second_3">Talk and sing to the bump</string>
+    <string name="trimester_support_second_4">Help with back or hip aches</string>
+    <string name="trimester_support_third_1">Get her comfortable — pillows, foot rubs</string>
+    <string name="trimester_support_third_2">Take over the heavy lifting and chores</string>
+    <string name="trimester_support_third_3">Pack the hospital bag together</string>
+    <string name="trimester_support_third_4">Know the plan for the big day</string>
+
+    <!-- Baby size comparisons, by week -->
+    <string name="baby_size_poppy_seed">a poppy seed</string>
+    <string name="baby_size_sesame_seed">a sesame seed</string>
+    <string name="baby_size_lentil">a lentil</string>
+    <string name="baby_size_blueberry">a blueberry</string>
+    <string name="baby_size_raspberry">a raspberry</string>
+    <string name="baby_size_cherry">a cherry</string>
+    <string name="baby_size_strawberry">a strawberry</string>
+    <string name="baby_size_lime">a lime</string>
+    <string name="baby_size_plum">a plum</string>
+    <string name="baby_size_peach">a peach</string>
+    <string name="baby_size_lemon">a lemon</string>
+    <string name="baby_size_apple">an apple</string>
+    <string name="baby_size_avocado">an avocado</string>
+    <string name="baby_size_pear">a pear</string>
+    <string name="baby_size_bell_pepper">a bell pepper</string>
+    <string name="baby_size_mango">a mango</string>
+    <string name="baby_size_banana">a banana</string>
+    <string name="baby_size_papaya">a papaya</string>
+    <string name="baby_size_corn">an ear of corn</string>
+    <string name="baby_size_zucchini">a zucchini</string>
+    <string name="baby_size_eggplant">an eggplant</string>
+    <string name="baby_size_cabbage">a cabbage</string>
+    <string name="baby_size_squash">a squash</string>
+    <string name="baby_size_cantaloupe">a cantaloupe</string>
+    <string name="baby_size_honeydew">a honeydew melon</string>
+    <string name="baby_size_pumpkin">a pumpkin</string>
+    <string name="baby_size_watermelon">a watermelon</string>
+
+    <!-- Journal / diary -->
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <string name="saving">Saving…</string>
+    <string name="add">Add</string>
+    <string name="done">Done</string>
+    <string name="date">Date</string>
+    <string name="journal_author_label">%1$s:</string>
+    <string name="journal_write">Write in journal</string>
+    <string name="journal_photos">Photos</string>
+    <string name="journal_new_entry">New entry</string>
+    <string name="journal_edit_day">Edit day</string>
+    <string name="journal_day">Day</string>
+    <string name="journal_words">Words</string>
+    <string name="journal_what_happened">What happened today?</string>
+    <string name="journal_choose_library">Choose from library</string>
+    <string name="journal_take_photo">Take a photo</string>
+    <string name="journal_empty_title">Your story starts here</string>
+    <string name="journal_empty_body">Tap ✎ to write about today — add a few words, some photos, or both.</string>
+    <string name="gallery_empty_title">No photos yet</string>
+    <string name="gallery_empty_body">Photos you add to a diary entry show up here, month by month.</string>
+
+    <!-- Milestones -->
+    <string name="milestones">Milestones</string>
+    <string name="milestones_empty">Add your firsts — first date, first kiss, the day you met…</string>
+    <string name="milestone_add">Add milestone</string>
+    <string name="milestone_placeholder">Milestone (e.g. First date)</string>
+    <string name="milestone_first_date">First date</string>
+    <string name="milestone_first_kiss">First kiss</string>
+    <string name="milestone_first_i_love_you">First \u201CI love you\u201D</string>
+    <string name="milestone_first_trip">First trip</string>
+    <string name="milestone_anniversary">Anniversary</string>
+    <string name="milestone_moved_in">Moved in together</string>
+    <string name="milestone_met_family">Met the family</string>
+    <string name="milestone_got_engaged">Got engaged</string>
+
+    <!-- Settings -->
+    <string name="settings_profile">Profile</string>
+    <string name="settings_relationship">Relationship</string>
+    <string name="settings_account">Account</string>
+    <string name="settings_premium">Leyla Premium</string>
+    <string name="settings_premium_title">Premium</string>
+    <string name="settings_premium_active">Active</string>
+    <string name="settings_unlock_premium">Unlock Leyla Premium</string>
+    <string name="settings_dev_unlock">Dev: unlock Premium</string>
+    <string name="settings_premium_footer_active">Every quiz pack and game is unlocked for both of you.</string>
+    <string name="settings_premium_footer_free">Starters, Relationship and How Well Do You Know Me? are free. Premium unlocks every other pack and game, for both of you.</string>
+    <string name="settings_your_partner">Your partner</string>
+    <string name="settings_partner">Partner</string>
+    <string name="settings_them">them</string>
+    <string name="settings_refer_to_as">Refer to %1$s as</string>
+    <string name="settings_together_since">Together since</string>
+    <string name="settings_days_together">Days together</string>
+    <string name="pronoun_she">She</string>
+    <string name="pronoun_he">He</string>
+    <string name="pronoun_they">They</string>
+    <string name="settings_health_section">Health Connect integration</string>
+    <string name="settings_health_footer">Leyla reads your menstrual cycle data from Health Connect, with your permission, so it can show your current phase, cycle day and next-period estimate in the Cycle screen. It is read-only — Leyla never writes to Health Connect and never uploads your health data. You can review or revoke access anytime in Settings ▸ Security &amp; privacy ▸ Health Connect ▸ App permissions.</string>
+    <string name="settings_sign_out">Sign out</string>
+    <string name="settings_unpair">Unpair</string>
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_delete_forever">Delete forever</string>
+    <string name="settings_account_footer">Unpairing keeps your account. Deleting removes it forever.</string>
+    <string name="settings_unpair_title">Unpair from your partner?</string>
+    <string name="settings_unpair_body">You\'ll both need to pair again to reconnect.</string>
+    <string name="settings_delete_title">Delete your account?</string>
+    <string name="settings_delete_body">This permanently removes your account, journal entries and photos. It can\'t be undone.</string>
+    <string name="settings_app_section">App</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="settings_on">On</string>
+    <string name="settings_off">Off</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_search_languages">Search languages</string>
+
+    <!-- Post-pairing setup flow -->
+    <string name="setup_about_partner">A little about %1$s</string>
+    <string name="setup_pronoun_body">How should we refer to %1$s? We\'ll use it in little messages like “thinking of them”.</string>
+    <string name="setup_continue">Continue</string>
+    <string name="setup_how_long">How long have you been together?</string>
+    <string name="setup_pick_the_day">Pick the day it all began.</string>
+    <string name="setup_days_together">%1$d days together 💜</string>
+    <string name="setup_finish">Finish</string>
+
+    <!-- Changing the account email -->
+    <string name="email_change_title">Change email</string>
+    <string name="email_change_action">Change</string>
+    <string name="email_new_email">New email</string>
+    <string name="email_placeholder">new@email.com</string>
+    <string name="email_we_will_send">We\'ll send a code there to confirm it\'s yours.</string>
+    <string name="email_send_code">Send code</string>
+    <string name="email_confirm">Confirm</string>
+    <string name="email_code_sent_to">Code sent to %1$s</string>
+    <string name="email_send_new_code">Send a new code</string>
+    <string name="email_check_inbox">Check your inbox. The code expires in 15 minutes.</string>
+    <string name="email_dev_code">Dev server: no email configured. Your code is %1$s.</string>
 </resources>

@@ -1,5 +1,6 @@
 package com.claudianapolitano.leyla.feature
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -20,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.claudianapolitano.leyla.core.Session
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
+import com.claudianapolitano.leyla.feature.auth.AuthOptionsScreen
 import com.claudianapolitano.leyla.feature.auth.SignInScreen
 import com.claudianapolitano.leyla.feature.auth.WelcomeScreen
 import com.claudianapolitano.leyla.feature.onboarding.PersonalOnboardingScreen
@@ -41,6 +43,21 @@ fun RootScreen(modifier: Modifier = Modifier) {
     /** Which auth form the signed-out screen is showing, if any. */
     var authMode by remember { mutableStateOf<AuthMode?>(null) }
 
+    /**
+     * Whether the email form is up. iOS presents it as a sheet over the
+     * provider options; here it is a second step, so Back returns to the
+     * providers rather than all the way out to the welcome screen.
+     */
+    var emailForm by remember { mutableStateOf(false) }
+
+    // Without this, system Back closes the app from anywhere in the signed-out
+    // flow: these steps are local state, not a nav back stack, so there is
+    // nothing for the framework to pop. Back on the welcome screen itself is
+    // left alone — leaving the app is the right thing to do there.
+    BackHandler(enabled = session.state == Session.State.SIGNED_OUT && authMode != null) {
+        if (emailForm) emailForm = false else authMode = null
+    }
+
     AnimatedContent(
         targetState = session.state,
         transitionSpec = { fadeIn(tween(220)) togetherWith fadeOut(tween(220)) },
@@ -57,14 +74,22 @@ fun RootScreen(modifier: Modifier = Modifier) {
 
             Session.State.SIGNED_OUT -> when (val mode = authMode) {
                 null -> WelcomeScreen(
-                    onRegister = { authMode = AuthMode.REGISTER },
-                    onLogIn = { authMode = AuthMode.LOGIN },
+                    onRegister = { emailForm = false; authMode = AuthMode.REGISTER },
+                    onLogIn = { emailForm = false; authMode = AuthMode.LOGIN },
                 )
 
-                else -> SignInScreen(
-                    isSignUp = mode == AuthMode.REGISTER,
-                    onBack = { authMode = null },
-                )
+                else -> if (emailForm) {
+                    SignInScreen(
+                        isSignUp = mode == AuthMode.REGISTER,
+                        onBack = { emailForm = false },
+                    )
+                } else {
+                    AuthOptionsScreen(
+                        isRegister = mode == AuthMode.REGISTER,
+                        onEmail = { emailForm = true },
+                        onBack = { authMode = null },
+                    )
+                }
             }
 
             Session.State.NEEDS_PERSONAL_ONBOARDING -> PersonalOnboardingScreen()

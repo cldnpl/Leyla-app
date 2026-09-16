@@ -102,6 +102,74 @@ data class PartnerPregnancy(
     val updatedAt: String? = null,
 )
 
+// MARK: - Journal, milestones and media
+
+/**
+ * A photo (or other file) held by the backend. [fileUrl] and [thumbUrl] are
+ * relative, couple-scoped and authenticated, so they are fetched the way
+ * `ApiConfig.imageRequest` sets up rather than as plain URLs.
+ */
+@Serializable
+data class MediaItem(
+    val id: String,
+    val kind: String,
+    val caption: String? = null,
+    val uploaderId: String,
+    val fileUrl: String,
+    val thumbUrl: String,
+    val createdAt: String? = null,
+)
+
+@Serializable
+data class MediaList(
+    val media: List<MediaItem> = emptyList(),
+    val count: Int = 0,
+    val storageUsed: Long = 0,
+)
+
+/** A "first" the couple wants to remember — first date, first trip, and so on. */
+@Serializable
+data class Milestone(
+    val id: String,
+    val title: String,
+    /** A calendar day, sent by the server as midnight UTC. */
+    val date: String,
+    val kind: String? = null,
+)
+
+@Serializable
+data class MilestoneList(val milestones: List<Milestone> = emptyList())
+
+/**
+ * One partner's diary entry for a day: free text and/or photos. Both partners'
+ * entries for the same date are grouped under a shared day card on the client.
+ */
+@Serializable
+data class JournalEntry(
+    val id: String,
+    val authorId: String,
+    /** The day being written about, as midnight UTC. */
+    val date: String,
+    val body: String = "",
+    val photos: List<MediaItem> = emptyList(),
+    val createdAt: String? = null,
+    val updatedAt: String? = null,
+)
+
+@Serializable
+data class JournalList(val entries: List<JournalEntry> = emptyList())
+
+/**
+ * Where the email-change code went. [devCode] is only ever populated by a dev
+ * server with no mail provider configured, so the flow is not a dead end there.
+ */
+@Serializable
+data class EmailChangeRequested(
+    val sentTo: String,
+    val expiresAt: String? = null,
+    val devCode: String? = null,
+)
+
 /** Error payload returned by the API (`{"error": "...", "code": "..."}`). */
 @Serializable
 data class ApiErrorResponse(

@@ -44,6 +44,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.core.ApiException
 import com.claudianapolitano.leyla.core.LeylaApi
 import com.claudianapolitano.leyla.core.Session
+import com.claudianapolitano.leyla.feature.cycle.CycleState
 import com.claudianapolitano.leyla.core.SharedConfig
 import com.claudianapolitano.leyla.core.rememberHaptics
 import com.claudianapolitano.leyla.designsystem.IOSText
@@ -153,7 +154,12 @@ class PairingViewModel : ViewModel() {
     }
 
     fun signOut() {
-        viewModelScope.launch { Session.signOut() }
+        viewModelScope.launch {
+            // The partner's shared cycle belongs to the account signing out; the
+            // health connection and cached cycle belong to this phone and stay.
+            CycleState.forgetPartnerData()
+            Session.signOut()
+        }
     }
 
     private fun describe(error: Throwable): String =

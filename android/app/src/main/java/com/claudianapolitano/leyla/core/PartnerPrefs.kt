@@ -30,10 +30,20 @@ object PartnerPrefs {
     }
 
     var pronoun: PartnerPronoun
-        get() = PartnerPronoun.from(
-            if (::prefs.isInitialized) prefs.getString(KEY_PRONOUN, null) else null
-        )
+        get() = PartnerPronoun.from(stored)
         set(value) {
             if (::prefs.isInitialized) prefs.edit().putString(KEY_PRONOUN, value.wire).apply()
         }
+
+    /**
+     * Whether the person actually picked one, as opposed to reading the "they"
+     * default. iOS keeps this distinction by storing the pronoun as optional;
+     * here [pronoun] has to answer with something, so the raw value is what
+     * says whether the question was ever asked — which is what decides whether
+     * the setup flow runs.
+     */
+    val hasChosenPronoun: Boolean get() = stored != null
+
+    private val stored: String?
+        get() = if (::prefs.isInitialized) prefs.getString(KEY_PRONOUN, null) else null
 }

@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -33,6 +32,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.leylaString
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
@@ -65,9 +65,9 @@ fun HomeTab(modifier: Modifier = Modifier, navController: NavHostController = re
     var showWidgetGuide by remember { mutableStateOf(false) }
 
     val title = when (route) {
-        HomeRoutes.MAP -> stringResource(R.string.map_title)
-        HomeRoutes.PROFILE -> stringResource(R.string.profile_title)
-        HomeRoutes.CYCLE -> stringResource(R.string.cycle_title)
+        HomeRoutes.MAP -> leylaString(R.string.map_title)
+        HomeRoutes.PROFILE -> leylaString(R.string.profile_title)
+        HomeRoutes.CYCLE -> leylaString(R.string.cycle_title)
         else -> null
     }
 
@@ -135,18 +135,18 @@ fun HomeTab(modifier: Modifier = Modifier, navController: NavHostController = re
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 Text(
-                    stringResource(R.string.widget_title),
+                    leylaString(R.string.widget_title),
                     style = IOSText.title2.weight(FontWeight.Bold),
                     color = colors.ink,
                 )
                 Text(
-                    stringResource(R.string.widget_coming_soon_body),
+                    leylaString(R.string.widget_coming_soon_body),
                     style = IOSText.subheadline,
                     color = colors.secondary,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 )
                 Text(
-                    stringResource(R.string.coming_soon),
+                    leylaString(R.string.coming_soon),
                     style = IOSText.caption.weight(FontWeight.Bold),
                     color = Theme.coral,
                     modifier = Modifier.padding(top = 4.dp),
