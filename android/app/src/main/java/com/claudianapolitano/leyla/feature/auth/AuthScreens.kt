@@ -182,13 +182,6 @@ fun AuthOptionsScreen(
             .fillMaxSize()
             .background(Theme.warmGradient),
     ) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier.align(Alignment.TopStart).systemBarsPadding().padding(8.dp),
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-        }
-
         Column(
             Modifier
                 .fillMaxSize()
@@ -240,6 +233,16 @@ fun AuthOptionsScreen(
                 )
             }
             Spacer(Modifier.size(40.dp))
+        }
+
+        // Last child on purpose: a Box hit-tests back to front, so a button
+        // declared before the full-size content underneath it would never see
+        // a tap — the content would take every one.
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier.align(Alignment.TopStart).systemBarsPadding().padding(8.dp),
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
         }
     }
 
@@ -358,13 +361,6 @@ fun SignInScreen(
             .fillMaxSize()
             .background(Theme.warmGradient),
     ) {
-        IconButton(
-            onClick = onBack,
-            modifier = Modifier.align(Alignment.TopStart).systemBarsPadding().padding(8.dp),
-        ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
-        }
-
         Column(
             Modifier
                 .fillMaxSize()
@@ -441,6 +437,16 @@ fun SignInScreen(
             )
             Spacer(Modifier.weight(1f))
             Spacer(Modifier.size(40.dp))
+        }
+
+        // Last child on purpose: a Box hit-tests back to front, so a button
+        // declared before the full-size content underneath it would never see
+        // a tap — the content would take every one.
+        IconButton(
+            onClick = onBack,
+            modifier = Modifier.align(Alignment.TopStart).systemBarsPadding().padding(8.dp),
+        ) {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back", tint = Color.White)
         }
     }
 }
