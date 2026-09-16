@@ -17,6 +17,7 @@ type Config struct {
 	AccessTokenTTL  time.Duration
 	RefreshTokenTTL time.Duration
 	AppleClientIDs  []string
+	GoogleClientIDs []string
 	APNS            APNSConfig
 	AllowedOrigins  []string
 	MediaDir        string
@@ -69,6 +70,9 @@ func Load() (*Config, error) {
 		AccessTokenTTL:  envDuration("ACCESS_TOKEN_TTL", 15*time.Minute),
 		RefreshTokenTTL: envDuration("REFRESH_TOKEN_TTL", 720*time.Hour),
 		AppleClientIDs:  envList("APPLE_CLIENT_IDS", "com.claudianapolitano.us"),
+		// No default: an unset list disables the endpoint rather than
+		// accepting tokens minted for someone else's OAuth client.
+		GoogleClientIDs: envList("GOOGLE_CLIENT_IDS", ""),
 		APNS: APNSConfig{
 			KeyPath:    env("APNS_KEY_PATH", ""),
 			KeyBase64:  env("APNS_KEY_BASE64", ""),
