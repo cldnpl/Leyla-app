@@ -5,6 +5,7 @@ import com.claudianapolitano.leyla.core.AppPrefs
 import com.claudianapolitano.leyla.core.LanguageManager
 import com.claudianapolitano.leyla.core.PartnerPrefs
 import com.claudianapolitano.leyla.core.TokenStore
+import com.claudianapolitano.leyla.core.WidgetStore
 import com.claudianapolitano.leyla.feature.cycle.CyclePrefs
 
 class LeylaApplication : Application() {
@@ -15,5 +16,6 @@ class LeylaApplication : Application() {
         AppPrefs.init(this)
         CyclePrefs.init(this)
         LanguageManager.init(this)
+        WidgetStore.init(this)
     }
 }
