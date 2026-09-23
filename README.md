@@ -11,13 +11,14 @@ Previously shipped as **Us.** — same app, same code, new name and softer look.
 | Path | What |
 |---|---|
 | [`ios/`](ios/) | SwiftUI app (iOS 16+) + WidgetKit extension. Swift only, HIG-first. |
+| [`android/`](android/) | Jetpack Compose app (Kotlin) + home-screen widget. Ported from the iOS app. |
 | [`server/`](server/) | Go backend — REST + WebSocket, PostgreSQL, APNs push. Deployed on Railway. |
 | [`landing/`](landing/) | Next.js marketing site (deploys to Vercel). |
 | [`docs/`](docs/) | Product & technical docs. Start with [`docs/PRD.md`](docs/PRD.md). |
 
 ## Key facts
 
-- **App name:** Leyla · **Platform:** iOS 16+ · **Language:** Swift/SwiftUI
+- **App name:** Leyla · **Platforms:** iOS 16+ (Swift/SwiftUI) · Android (Kotlin/Compose)
 - **Bundle ID:** `com.claudianapolitano.us` (unchanged from the Us. era so the App Store record stays continuous)
 - **Backend:** Go · Postgres · media on a Railway volume · API at `https://us-app-production-9aa4.up.railway.app`
 - **Auth:** Sign in with Apple + Email/Password
