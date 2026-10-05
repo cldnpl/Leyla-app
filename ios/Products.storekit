@@ -40,13 +40,13 @@
           "localizations" : [
             {
               "description" : "Every quiz pack, every game, no limits — for both of you.",
-              "displayName" : "Us. Premium",
+              "displayName" : "Leyla Premium",
               "locale" : "en_US"
             }
           ],
           "productID" : "us.premium.monthly",
           "recurringSubscriptionPeriod" : "P1M",
-          "referenceName" : "Us Premium Monthly",
+          "referenceName" : "Leyla Premium Monthly",
           "subscriptionGroupID" : "20240001",
           "type" : "RecurringSubscription"
         }
