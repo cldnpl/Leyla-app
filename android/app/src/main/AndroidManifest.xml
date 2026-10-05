@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Snap Hunt photographs the clue. The camera is optional: a device
+         without one falls back to the photo picker, so it must not narrow
+         Play Store availability. -->
+    <!-- Android 13+ will not show a notification without this being granted. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
+    <!-- Health Connect, read-only. Leyla never writes a health record and never
+         uploads one: the cycle is derived on the phone, and only the coarse
+         summary the user picks is shared with her partner. -->
+    <uses-permission android:name="android.permission.health.READ_MENSTRUATION" />
+
+    <!-- Without this, Android 15+ hands back only the last 30 days, which is
+         rarely even two cycles — not enough to average a cycle length from.
+         iOS reads 12 months, so ask for the history to match. Optional: a
+         refusal still leaves 30 days, and the cycle just stays an estimate. -->
+    <uses-permission android:name="android.permission.health.READ_HEALTH_DATA_HISTORY" />
+
+    <!-- Health Connect ships inside Android 14+; on older releases it is an app.
+         Without this query the client cannot see whether the provider exists. -->
+    <queries>
+        <package android:name="com.google.android.apps.healthdata" />
+    </queries>
+
+    <application
+        android:name=".LeylaApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Leyla">
+
+        <!-- Injected from MAPS_API_KEY in local.properties (see app/build.gradle.kts). -->
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="${MAPS_API_KEY}" />
+
+        <!-- ACTION_IMAGE_CAPTURE writes the full-resolution shot to a file we
+             hand it; without a provider the camera only returns a thumbnail,
+             which is far too small to judge a Snap Hunt find by. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Leyla"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Android 14+ asks the app to justify the permission from inside
+                 the Health Connect settings screen. Both actions land on the
+                 same activity, which routes to the rationale. -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+        </activity>
+
+        <!-- Pre-14 Health Connect looks for the rationale under this alias. -->
+        <activity-alias
+            android:name="ViewPermissionUsageActivity"
+            android:exported="true"
+            android:targetActivity=".MainActivity"
+            android:permission="android.permission.START_VIEW_PERMISSION_USAGE">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE" />
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- The home-screen widget: days together, distance, and a heart that
+             sends "I miss you" without opening the app. -->
+        <receiver
+            android:name=".widget.LeylaWidget"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_leyla_info" />
+        </receiver>
+    </application>
+</manifest>

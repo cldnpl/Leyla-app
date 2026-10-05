@@ -1,1 +1,17 @@
 .vercel
+
+# dipendenze
+/node_modules
+node_modules/
+node_modules.icloud-bak/
+node_modules?2/
+
+# build
+/.next/
+/out/
+
+# varie
+.DS_Store
+*.pem
+.env*.local
+npm-debug.log*

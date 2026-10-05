@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Top stop of Theme.softBackground (peach @ 35%) over white. -->
+    <color name="window_background">#FFFAF0E8</color>
+</resources>

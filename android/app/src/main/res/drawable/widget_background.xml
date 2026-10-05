@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The warm blush→coral gradient the app uses, so a placed widget reads as
+     Leyla at a glance on a crowded home screen. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <gradient
+        android:startColor="#FFB9B0"
+        android:endColor="#FF6B6B"
+        android:angle="315" />
+    <corners android:radius="28dp" />
+</shape>

@@ -26,6 +26,7 @@ type Deps struct {
 	Logger  *slog.Logger
 	Store   *store.Store
 	Apple   *auth.AppleVerifier
+	Google  *auth.OIDCVerifier
 	Push    push.Sender
 	Mail    mail.Sender
 	Media   *media.Storage
@@ -83,6 +84,7 @@ func NewRouter(d Deps) http.Handler {
 			r.Post("/auth/register", d.handleRegister)
 			r.Post("/auth/login", d.handleLogin)
 			r.Post("/auth/apple", d.handleApple)
+			r.Post("/auth/google", d.handleGoogle)
 			r.Post("/auth/refresh", d.handleRefresh)
 			r.Post("/auth/logout", d.handleLogout)
 		})
