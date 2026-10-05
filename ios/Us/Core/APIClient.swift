@@ -21,11 +21,37 @@ struct AnyEncodable: Encodable {
     func encode(to encoder: Encoder) throws { try encodeFunc(encoder) }
 }
 
+/// Serializes token refreshes so that N requests failing with 401 at the same
+/// time trigger **one** rotation, not N. Without this the app races itself:
+/// every concurrent request POSTs the same refresh token, the server rotates on
+/// the first and 401s the rest, and one of those losing 401s propagates up as a
+/// real "session expired". A caller that arrives while a refresh is in flight
+/// awaits that same result instead.
+private actor RefreshGate {
+    private var inFlight: Task<Bool, Error>?
+
+    /// - Parameter tokenBefore: the access token the caller's failed request
+    ///   actually used. If the stored token has already moved on, another
+    ///   refresh beat us to it and this caller should just retry.
+    func coalesce(tokenBefore: String?,
+                  refresh: @escaping () async throws -> Bool) async throws -> Bool {
+        if let inFlight { return try await inFlight.value }
+        if let tokenBefore, let current = TokenStore.accessToken, current != tokenBefore {
+            return true // a sibling request already rotated the pair
+        }
+        let task = Task { try await refresh() }
+        inFlight = task
+        defer { inFlight = nil }
+        return try await task.value
+    }
+}
+
 final class APIClient {
     static let shared = APIClient()
 
     private let baseURL = APIConfig.baseURL
     private let session = URLSession.shared
+    private let refreshGate = RefreshGate()
     let decoder: JSONDecoder
     let encoder: JSONEncoder
 
@@ -65,8 +91,10 @@ final class APIClient {
         var req = URLRequest(url: try await localizedURL(for: path, queryItems: queryItems))
         req.httpMethod = method
         req.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        var usedToken: String?
         if authorized, let token = TokenStore.accessToken {
             req.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+            usedToken = token
         }
         if let body { req.httpBody = try encoder.encode(AnyEncodable(body)) }
 
@@ -74,7 +102,7 @@ final class APIClient {
         guard let http = response as? HTTPURLResponse else { throw APIClientError.invalidResponse }
 
         if http.statusCode == 401 && authorized && retryOn401 {
-            if try await refresh() {
+            if try await refresh(tokenBefore: usedToken) {
                 return try await raw(path, method: method, body: body, queryItems: queryItems, authorized: authorized, retryOn401: false)
             }
             throw APIClientError.unauthorized
@@ -86,8 +114,23 @@ final class APIClient {
         return data
     }
 
-    /// Attempts to rotate the refresh token. Returns true on success.
-    private func refresh() async throws -> Bool {
+    /// Explicitly rotates the token pair, coalesced with any refresh already in
+    /// flight. Session bootstrap calls this to give a first-try 401 a second
+    /// chance before concluding the login is gone.
+    func forceRefresh() async -> Bool {
+        (try? await refresh(tokenBefore: nil)) ?? false
+    }
+
+    /// Attempts to rotate the refresh token, sharing one rotation across every
+    /// caller that fails with 401 at the same time (see `RefreshGate`).
+    private func refresh(tokenBefore: String?) async throws -> Bool {
+        try await refreshGate.coalesce(tokenBefore: tokenBefore) { [self] in
+            try await performRefresh()
+        }
+    }
+
+    /// The actual refresh round-trip. Only ever invoked through `RefreshGate`.
+    private func performRefresh() async throws -> Bool {
         guard let rt = TokenStore.refreshToken else { return false }
         var req = URLRequest(url: try await localizedURL(for: "/v1/auth/refresh"))
         req.httpMethod = "POST"
@@ -188,7 +231,7 @@ final class APIClient {
         }
 
         var (data, response) = try await session.data(for: makeRequest())
-        if (response as? HTTPURLResponse)?.statusCode == 401, try await refresh() {
+        if (response as? HTTPURLResponse)?.statusCode == 401, try await refresh(tokenBefore: TokenStore.accessToken) {
             (data, response) = try await session.data(for: makeRequest())
         }
         guard let status = (response as? HTTPURLResponse)?.statusCode else {

@@ -100,9 +100,15 @@ enum TokenStore {
 
         let localIsComplete = localAccess?.isEmpty == false && localRefresh?.isEmpty == false
         let sharedIsNewer = (shared.updatedAt ?? .distantPast) > (localUpdatedAt ?? .distantPast)
+        // A strictly later access-token expiry means the widget rotated the pair
+        // more recently than this process did: the app mirrors its own pair here
+        // synchronously inside `TokenStore.save`, so it can never be behind on a
+        // pair it issued. Adopt regardless of the timestamp — the widget only
+        // ever writes a pair the server returned 200 for, so it was valid when
+        // stored, and any newer rotation would have written an even later one.
         let sharedHasLaterExpiry = jwtExpiry(shared.accessToken) > jwtExpiry(localAccess)
 
-        if !localIsComplete || sharedIsNewer || (localUpdatedAt == nil && sharedHasLaterExpiry) {
+        if !localIsComplete || sharedIsNewer || sharedHasLaterExpiry {
             // Do not write this pair back through `SharedTokenStore`: it is
             // already the authoritative widget-issued pair, and keeping its
             // timestamp makes repeated launches deterministic.

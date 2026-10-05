@@ -59,8 +59,14 @@ final class Session: ObservableObject {
             await PushManager.shared.onAuthenticated()
             connectRealtime()
         } catch APIClientError.unauthorized {
-            // Refresh token was rejected: the only unrecoverable case, and the
-            // only place bootstrap is allowed to drop the session.
+            // A single 401 is not proof the session is dead. The widget extension
+            // rotates the same token pair on its own schedule; its freshly issued
+            // pair may not have propagated into this process yet, or a rotation
+            // may still be finishing. Re-sync from the App Group, let it settle,
+            // and try once more. Only a second, definitive failure signs out.
+            if await recoverFromUnauthorized() {
+                return
+            }
             TokenStore.clear()
             SessionCache.clear()
             state = .signedOut
@@ -69,6 +75,38 @@ final class Session: ObservableObject {
             // still valid, so keep the user logged in and restore the last known
             // session from cache; live data refreshes on next use.
             restoreCachedSession()
+        }
+    }
+
+    /// Second-chance recovery after bootstrap's first authenticated call came
+    /// back 401. Covers the app/widget refresh-token rotation race: the valid
+    /// pair is often already in the App Group, or a competing refresh is still
+    /// in flight. Returns true only if the signed-in session was restored.
+    private func recoverFromUnauthorized() async -> Bool {
+        // Pull in any newer pair the widget wrote while the app was closed.
+        TokenStore.adoptSharedTokensIfNewer()
+        // Give an in-flight rotation (widget, or a sibling request) time to
+        // finish writing its pair back to the shared store, then re-check.
+        try? await Task.sleep(nanoseconds: 1_200_000_000)
+        TokenStore.adoptSharedTokensIfNewer()
+        guard TokenStore.refreshToken != nil, await APIClient.shared.forceRefresh() else {
+            return false
+        }
+        do {
+            user = try await APIClient.shared.me()
+            syncPronounFromServer()
+            syncCycleSettingsFromServer()
+            try await refreshCouple()
+            await PushManager.shared.onAuthenticated()
+            connectRealtime()
+            return true
+        } catch APIClientError.unauthorized {
+            return false // definitively rejected — bootstrap will sign out
+        } catch {
+            // Transient again: the tokens are fine, so stay signed in and
+            // restore the last known session from cache.
+            restoreCachedSession()
+            return true
         }
     }
 
