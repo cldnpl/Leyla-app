@@ -359,6 +359,9 @@
     <string name="widget_km_apart">%1$d km apart</string>
     <string name="widget_no_distance">Not sharing location</string>
     <string name="widget_miss_you_action">Send “I miss you”</string>
+    <string name="widget_sending">Sending…</string>
+    <string name="widget_sent">Sent ✓</string>
+    <string name="widget_send_failed">Couldn\'t send</string>
     <string name="widget_miss_you_failed">Couldn\'t send “I miss you”. Open Leyla and try again.</string>
     <string name="widget_dash">—</string>
     <string name="widget_add_for_me">Add it to my home screen</string>

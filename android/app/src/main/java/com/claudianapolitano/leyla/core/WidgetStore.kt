@@ -23,7 +23,12 @@ data class WidgetSnapshot(
     val myName: String? = null,
     val daysTogether: Int? = null,
     val distanceKm: Double? = null,
+    /** What the heart tap is doing right now; null once it has expired. */
+    val missYouStatus: MissYouStatus? = null,
 )
+
+/** The feedback a heart tap shows on the widget itself, for a few seconds. */
+enum class MissYouStatus { SENDING, SENT, FAILED }
 
 object WidgetStore {
 
@@ -32,6 +37,8 @@ object WidgetStore {
     private const val KEY_MY_NAME = "myName"
     private const val KEY_START_DATE = "startDate"
     private const val KEY_DISTANCE_KM = "distanceKm"
+    private const val KEY_STATUS = "missYouStatus"
+    private const val KEY_STATUS_UNTIL = "missYouStatusUntil"
 
     private lateinit var prefs: SharedPreferences
 
@@ -74,6 +81,24 @@ object WidgetStore {
         LeylaWidget.refresh(appContext)
     }
 
+    /**
+     * Stores the heart tap's status with an expiry rather than relying on
+     * someone to clear it: if the process dies mid-send, the next redraw
+     * simply finds it expired instead of saying "Sending…" forever.
+     */
+    fun saveMissYouStatus(status: MissYouStatus?, forMillis: Long = 0) {
+        if (!ready) return
+        prefs.edit().apply {
+            if (status == null) {
+                remove(KEY_STATUS)
+                remove(KEY_STATUS_UNTIL)
+            } else {
+                putString(KEY_STATUS, status.name)
+                putLong(KEY_STATUS_UNTIL, System.currentTimeMillis() + forMillis)
+            }
+        }.apply()
+    }
+
     fun load(context: Context): WidgetSnapshot {
         init(context)
         val start = prefs.getString(KEY_START_DATE, null)
@@ -89,6 +114,9 @@ object WidgetStore {
             } else {
                 null
             },
+            missYouStatus = prefs.getString(KEY_STATUS, null)
+                ?.takeIf { System.currentTimeMillis() < prefs.getLong(KEY_STATUS_UNTIL, 0) }
+                ?.let { runCatching { MissYouStatus.valueOf(it) }.getOrNull() },
         )
     }
 
