@@ -141,9 +141,10 @@ object Session {
             it.copy(
                 state = State.READY,
                 partner = User(id = "test-partner", displayName = "Partner"),
-                couple = Couple(id = "test-couple", status = "active"),
+                couple = Couple(id = "test-couple", status = "active", startDate = AppPrefs.testStartDate),
             )
         }
+        publishCouple()
     }
 
     /** Restores a persisted demo pairing so relaunch goes straight to Home. */
@@ -168,11 +169,23 @@ object Session {
         runCatching { LeylaApi.updatePartnerPronoun(pronoun.wire) }.getOrNull()?.let(::updateUser)
     }
 
-    /** Saves the day the relationship started, which Home counts from. */
-    suspend fun saveStartDate(isoDay: String) {
-        val couple = runCatching { LeylaApi.updateCoupleStartDate(isoDay) }.getOrNull() ?: return
-        _snapshot.update { it.copy(couple = couple.couple ?: it.couple) }
+    /**
+     * Saves the day the relationship started, which Home counts from. Returns
+     * false if it could not be saved, so the caller can say so instead of
+     * letting the setup flow come back on the next launch.
+     */
+    suspend fun saveStartDate(isoDay: String): Boolean {
+        if (SharedConfig.DEMO_MODE && AppPrefs.testPaired) {
+            // Demo couple: there is no server row, so keep it on the device.
+            AppPrefs.testStartDate = isoDay
+            _snapshot.update { it.copy(couple = it.couple?.copy(startDate = isoDay)) }
+            publishCouple()
+            return true
+        }
+        val couple = runCatching { LeylaApi.updateCoupleStartDate(isoDay) }.getOrNull() ?: return false
+        _snapshot.update { it.copy(couple = couple) }
         publishCouple()
+        return true
     }
 
     fun noteRemoteChange() {
@@ -191,9 +204,14 @@ object Session {
      */
     private fun publishCouple() {
         val snapshot = _snapshot.value
+        // Same demo fallback as Home (and iOS's widget snapshot), so the demo
+        // widget says "Alex" like the screen does rather than "Partner".
+        val partnerName = snapshot.partner?.displayName
+            .takeUnless { SharedConfig.DEMO_MODE && (it.isNullOrEmpty() || it == "Partner") }
+            ?: if (SharedConfig.DEMO_MODE) "Alex" else null
         WidgetStore.saveCouple(
             myName = snapshot.user?.displayName,
-            partnerName = snapshot.partner?.displayName,
+            partnerName = partnerName,
             startDate = snapshot.couple?.startDate,
         )
     }

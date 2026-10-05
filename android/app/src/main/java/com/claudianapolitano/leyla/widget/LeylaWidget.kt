@@ -6,10 +6,20 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.os.Handler
+import android.os.Looper
 import android.widget.RemoteViews
+import android.widget.Toast
 import com.claudianapolitano.leyla.MainActivity
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.AppPrefs
 import com.claudianapolitano.leyla.core.LeylaApi
+import com.claudianapolitano.leyla.core.PartnerPrefs
+import com.claudianapolitano.leyla.core.PartnerPronoun
+import com.claudianapolitano.leyla.core.SharedConfig
 import com.claudianapolitano.leyla.core.WidgetStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,11 +58,38 @@ class LeylaWidget : AppWidgetProvider() {
         if (intent.action != ACTION_MISS_YOU) return
 
         // The tap is the whole point of the widget, so it must not wait for the
-        // app to open. A widget's onReceive gets ~10 seconds; one POST fits.
+        // app to open. A widget's onReceive gets ~10 seconds; one POST fits,
+        // and goAsync keeps the process alive until it has.
+        val pending = goAsync()
+        val partnerName = WidgetStore.load(context).partnerName
         CoroutineScope(Dispatchers.IO).launch {
-            runCatching { LeylaApi.sendMissYou() }
+            val sent = try {
+                // The demo couple has no server row to send to.
+                if (!(SharedConfig.DEMO_MODE && AppPrefs.testPaired)) LeylaApi.sendMissYou()
+                true
+            } catch (_: Exception) {
+                false
+            }
+            // Nothing on a home screen says the tap did anything, so say it.
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(context, toastText(context, sent, partnerName), Toast.LENGTH_SHORT).show()
+                pending.finish()
+            }
         }
         refresh(context)
+    }
+
+    private fun toastText(context: Context, sent: Boolean, partnerName: String?): String {
+        if (!sent) return context.getString(R.string.widget_miss_you_failed)
+        val name = partnerName?.takeIf { it.isNotBlank() } ?: context.getString(R.string.your_partner)
+        return context.getString(
+            when (PartnerPrefs.pronoun) {
+                PartnerPronoun.SHE -> R.string.miss_you_toast_her
+                PartnerPronoun.HE -> R.string.miss_you_toast_him
+                PartnerPronoun.THEY -> R.string.miss_you_toast_them
+            },
+            name,
+        )
     }
 
     private fun buildViews(context: Context): RemoteViews {
@@ -123,10 +160,39 @@ class LeylaWidget : AppWidgetProvider() {
         }
 
         /** Whether the person has actually placed one, which the guide asks. */
-        fun isPlaced(context: Context): Boolean =
+        fun isPlaced(context: Context): Boolean = placedCount(context) > 0
+
+        /** How many Leyla widgets are on the home screen right now. */
+        fun placedCount(context: Context): Int =
             AppWidgetManager.getInstance(context)
                 .getAppWidgetIds(ComponentName(context, LeylaWidget::class.java))
-                .isNotEmpty()
+                .size
+
+        /** Xiaomi, Redmi and POCO all run Xiaomi's launcher and permission model. */
+        fun isXiaomi(): Boolean =
+            Build.MANUFACTURER.equals("Xiaomi", ignoreCase = true) ||
+                Build.BRAND.lowercase() in setOf("xiaomi", "redmi", "poco")
+
+        /**
+         * Opens the screen where "Home screen shortcuts" can be turned on —
+         * Xiaomi's own permission editor when it exists, the standard app
+         * settings page otherwise.
+         */
+        fun openShortcutPermission(context: Context) {
+            val miui = Intent("miui.intent.action.APP_PERM_EDITOR")
+                .setClassName(
+                    "com.miui.securitycenter",
+                    "com.miui.permcenter.permissions.PermissionsEditorActivity",
+                )
+                .putExtra("extra_pkgname", context.packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val fallback = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.fromParts("package", context.packageName, null),
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            runCatching { context.startActivity(miui) }
+                .onFailure { runCatching { context.startActivity(fallback) } }
+        }
 
         /**
          * Whether this launcher lets an app ask for the widget to be pinned.

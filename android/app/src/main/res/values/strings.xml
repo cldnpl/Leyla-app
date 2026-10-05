@@ -20,6 +20,9 @@
     <string name="hero_thinking_of_him">Let %1$s know you\'re thinking of him</string>
     <string name="hero_thinking_of_them">Let %1$s know you\'re thinking of them</string>
     <string name="hero_sent">Sent!</string>
+    <string name="miss_you_toast_her">%1$s now knows you\'re thinking of her 💗</string>
+    <string name="miss_you_toast_him">%1$s now knows you\'re thinking of him 💗</string>
+    <string name="miss_you_toast_them">%1$s now knows you\'re thinking of them 💗</string>
     <string name="hero_send_accessibility">Send I miss you to %1$s</string>
     <string name="hero_sent_accessibility">Sent</string>
 
@@ -335,6 +338,7 @@
     <string name="setup_pick_the_day">Pick the day it all began.</string>
     <string name="setup_days_together">%1$d days together 💜</string>
     <string name="setup_finish">Finish</string>
+    <string name="setup_save_failed">Couldn\'t save the date. Check your connection and try again.</string>
 
     <!-- Changing the account email -->
     <string name="email_change_title">Change email</string>
@@ -355,9 +359,16 @@
     <string name="widget_km_apart">%1$d km apart</string>
     <string name="widget_no_distance">Not sharing location</string>
     <string name="widget_miss_you_action">Send “I miss you”</string>
+    <string name="widget_miss_you_failed">Couldn\'t send “I miss you”. Open Leyla and try again.</string>
     <string name="widget_dash">—</string>
     <string name="widget_add_for_me">Add it to my home screen</string>
     <string name="widget_check_home">Check your home screen</string>
+    <string name="widget_added">Added to your home screen 💗</string>
+    <string name="widget_try_again">Try again</string>
+    <string name="widget_nothing_happened">Nothing appeared?</string>
+    <string name="widget_xiaomi_hint">Xiaomi, Redmi and POCO phones block this until Leyla is allowed to add home screen shortcuts. Turn on “Home screen shortcuts” in Leyla\'s permissions, then tap Try again.</string>
+    <string name="widget_generic_hint">Your launcher didn\'t place it. Follow the steps below to add it yourself.</string>
+    <string name="widget_open_permissions">Open Leyla\'s permissions</string>
     <string name="widget_or_by_hand">Or add it yourself</string>
     <string name="widget_step_1">Touch and hold an empty spot on your home screen.</string>
     <string name="widget_step_2">Tap <b>Widgets</b>.</string>

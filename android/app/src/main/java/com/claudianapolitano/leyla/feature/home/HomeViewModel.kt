@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.claudianapolitano.leyla.R
 import com.claudianapolitano.leyla.core.ApiException
+import com.claudianapolitano.leyla.core.AppPrefs
 import com.claudianapolitano.leyla.core.Coordinate
 import com.claudianapolitano.leyla.core.LeylaApi
 import com.claudianapolitano.leyla.core.LocationRepository
@@ -19,8 +20,11 @@ import com.claudianapolitano.leyla.feature.cycle.PregnancyEngine
 import com.claudianapolitano.leyla.feature.cycle.PregnancyInsights
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -38,6 +42,7 @@ data class HomeUiState(
     val myAvatarPath: String? = null,
     val partnerAvatarPath: String? = null,
     @param:StringRes val heroTitleRes: Int = R.string.hero_thinking_of_them,
+    @param:StringRes val sentToastRes: Int = R.string.miss_you_toast_them,
     val missYouSent: Boolean = false,
     val isSending: Boolean = false,
     val errorMessage: String? = null,
@@ -52,6 +57,10 @@ class HomeViewModel : ViewModel() {
 
     private val _state = MutableStateFlow(HomeUiState())
     val state: StateFlow<HomeUiState> = _state.asStateFlow()
+
+    /** One event per "I miss you" that went through; Home shows a toast for it. */
+    private val _missYouSent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    val missYouSent: SharedFlow<Unit> = _missYouSent.asSharedFlow()
 
     private var partnerLocation: PartnerLocation? = null
     private var pollJob: Job? = null
@@ -75,6 +84,7 @@ class HomeViewModel : ViewModel() {
                         myAvatarPath = session.user?.avatarPath,
                         partnerAvatarPath = session.partner?.avatarPath,
                         heroTitleRes = heroTitleRes(),
+                        sentToastRes = sentToastRes(),
                         mapMine = mapMine,
                         mapPartner = mapPartner,
                         mapKm = LocationRepository.kmBetween(mapMine, mapPartner),
@@ -128,7 +138,10 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _state.update { it.copy(isSending = true, errorMessage = null) }
             try {
-                LeylaApi.sendMissYou()
+                // The demo couple has no server row, so the request could only
+                // come back "pair with your partner first".
+                if (!(SharedConfig.DEMO_MODE && AppPrefs.testPaired)) LeylaApi.sendMissYou()
+                _missYouSent.tryEmit(Unit)
                 _state.update { it.copy(isSending = false, missYouSent = true) }
                 delay(2_000)
                 _state.update { it.copy(missYouSent = false) }
@@ -166,6 +179,13 @@ class HomeViewModel : ViewModel() {
         PartnerPronoun.SHE -> R.string.hero_thinking_of_her
         PartnerPronoun.HE -> R.string.hero_thinking_of_him
         PartnerPronoun.THEY -> R.string.hero_thinking_of_them
+    }
+
+    @StringRes
+    private fun sentToastRes(): Int = when (PartnerPrefs.pronoun) {
+        PartnerPronoun.SHE -> R.string.miss_you_toast_her
+        PartnerPronoun.HE -> R.string.miss_you_toast_him
+        PartnerPronoun.THEY -> R.string.miss_you_toast_them
     }
 
     /** Real partner position — only while they're actually sharing. */

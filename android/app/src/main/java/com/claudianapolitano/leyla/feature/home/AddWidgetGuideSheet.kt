@@ -21,10 +21,13 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.TextButton
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -73,6 +76,33 @@ fun AddWidgetGuideSheet(onDismiss: () -> Unit) {
     val snapshot = remember { WidgetStore.load(context) }
     val canPin = remember { LeylaWidget.canRequestPin(context) }
     var requested by remember { mutableStateOf(false) }
+    /** Bumps on every request, so "Try again" restarts the wait from zero. */
+    var attempt by remember { mutableStateOf(0) }
+    var added by remember { mutableStateOf(false) }
+    /** The request went out but no widget landed — the launcher ignored it. */
+    var stalled by remember { mutableStateOf(false) }
+
+    // `requestPinAppWidget` returning true only means the launcher took the
+    // request. Some (Xiaomi's, notably) then drop it without a word unless the
+    // app may add home-screen shortcuts — so watch for the widget to actually
+    // arrive, and own up when it doesn't instead of saying "check your home
+    // screen" forever.
+    LaunchedEffect(attempt) {
+        if (attempt == 0) return@LaunchedEffect
+        val before = LeylaWidget.placedCount(context)
+        var waitedMs = 0
+        while (true) {
+            delay(500)
+            waitedMs += 500
+            if (LeylaWidget.placedCount(context) > before) {
+                added = true
+                stalled = false
+                requested = false
+                return@LaunchedEffect
+            }
+            if (waitedMs >= 6_000) stalled = true
+        }
+    }
 
     val partnerName = session.partner?.displayName?.takeIf { it.isNotBlank() }
         ?: leylaString(R.string.your_partner)
@@ -106,14 +136,27 @@ fun AddWidgetGuideSheet(onDismiss: () -> Unit) {
             if (canPin) {
                 PrimaryButton(
                     text = leylaString(
-                        if (requested) R.string.widget_check_home else R.string.widget_add_for_me,
+                        when {
+                            added -> R.string.widget_added
+                            stalled -> R.string.widget_try_again
+                            requested -> R.string.widget_check_home
+                            else -> R.string.widget_add_for_me
+                        },
                     ),
                     onClick = {
-                        if (LeylaWidget.requestPin(context)) requested = true
+                        stalled = false
+                        if (LeylaWidget.requestPin(context)) {
+                            requested = true
+                            attempt++
+                        } else {
+                            stalled = true
+                        }
                     },
                     icon = Icons.AutoMirrored.Filled.AddToHomeScreen,
-                    enabled = !requested,
+                    enabled = !added && (!requested || stalled),
                 )
+
+                if (stalled) PinStalledHint()
             }
 
             LeylaCard(cornerRadius = 20.dp) {
@@ -212,6 +255,41 @@ private fun WidgetPreview(days: Int?, distanceKm: Double?, partnerName: String?)
             color = colors.secondary,
             modifier = Modifier.padding(top = 8.dp),
         )
+    }
+}
+
+/**
+ * Shown when the launcher accepted the pin request but nothing landed. On
+ * Xiaomi that is the "Home screen shortcuts" permission, off by default for
+ * apps not installed from their store; elsewhere the manual steps still work.
+ */
+@Composable
+private fun PinStalledHint() {
+    val colors = LeylaTheme.colors
+    val context = LocalContext.current
+    val isXiaomi = remember { LeylaWidget.isXiaomi() }
+    LeylaCard(cornerRadius = 20.dp) {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(
+                leylaString(R.string.widget_nothing_happened),
+                style = IOSText.subheadline.weight(FontWeight.SemiBold),
+                color = colors.ink,
+            )
+            Text(
+                leylaString(if (isXiaomi) R.string.widget_xiaomi_hint else R.string.widget_generic_hint),
+                style = IOSText.footnote,
+                color = colors.secondary,
+            )
+            if (isXiaomi) {
+                TextButton(onClick = { LeylaWidget.openShortcutPermission(context) }) {
+                    Text(
+                        leylaString(R.string.widget_open_permissions),
+                        style = IOSText.subheadline.weight(FontWeight.SemiBold),
+                        color = Theme.rose,
+                    )
+                }
+            }
+        }
     }
 }
 
