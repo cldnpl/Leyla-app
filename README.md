@@ -24,7 +24,6 @@ Previously shipped as **Us.** — same app, same code, new name and softer look.
 - **Auth:** Sign in with Apple + Email/Password
 - **Monetization:** freemium — everything free-but-limited; Leyla Premium **€2.99/month**
 - **Maps:** Apple MapKit (opt-in partner location)
-- **Health:** read-only HealthKit integration for menstrual cycle + pregnancy tracking
 
 ## Quick start (backend)
 
