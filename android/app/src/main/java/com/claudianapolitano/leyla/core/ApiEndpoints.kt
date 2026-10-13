@@ -76,8 +76,11 @@ object LeylaApi {
 
     suspend fun getCouple(): CoupleResponse = ApiClient.get("/v1/couple")
 
-    /** The day the relationship started, which Home counts from. */
-    suspend fun updateCoupleStartDate(isoDay: String): CoupleResponse =
+    /**
+     * The day the relationship started, which Home counts from. Unlike GET, the
+     * server answers with the bare couple — no `paired`/`partner` envelope.
+     */
+    suspend fun updateCoupleStartDate(isoDay: String): Couple =
         ApiClient.send("/v1/couple", HttpMethod.Patch, UpdateCoupleBody(isoDay))
 
     /**

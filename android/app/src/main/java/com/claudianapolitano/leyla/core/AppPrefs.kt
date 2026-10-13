@@ -15,6 +15,7 @@ object AppPrefs {
     private const val FILE = "leyla_app_prefs"
     private const val KEY_ONBOARDING_DONE = "didCompletePersonalOnboarding"
     private const val KEY_TEST_PAIRED = "testPaired"
+    private const val KEY_TEST_START_DATE = "testStartDate"
 
     private lateinit var prefs: SharedPreferences
 
@@ -41,8 +42,20 @@ object AppPrefs {
             if (::prefs.isInitialized) prefs.edit().putBoolean(KEY_TEST_PAIRED, value).apply()
         }
 
+    /**
+     * The demo couple's start date (ISO day). The demo couple has no server
+     * row to PATCH, so without this the setup flow asked again on every launch.
+     */
+    var testStartDate: String?
+        get() = if (::prefs.isInitialized) prefs.getString(KEY_TEST_START_DATE, null) else null
+        set(value) {
+            if (::prefs.isInitialized) prefs.edit().putString(KEY_TEST_START_DATE, value).apply()
+        }
+
     /** Clears what belongs to the account. Onboarding progress is device-level. */
     fun clearAccountState() {
-        if (::prefs.isInitialized) prefs.edit().putBoolean(KEY_TEST_PAIRED, false).apply()
+        if (::prefs.isInitialized) {
+            prefs.edit().putBoolean(KEY_TEST_PAIRED, false).remove(KEY_TEST_START_DATE).apply()
+        }
     }
 }

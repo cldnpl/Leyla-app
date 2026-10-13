@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { bodyFont, scriptFont } from "./fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -13,14 +14,18 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: "#ff6b6b",
+};
+
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className={`${bodyFont.variable} ${scriptFont.variable}`}>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }

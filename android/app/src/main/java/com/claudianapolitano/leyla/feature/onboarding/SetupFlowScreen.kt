@@ -95,6 +95,7 @@ fun SetupFlowScreen(onDone: () -> Unit, modifier: Modifier = Modifier) {
     var selected by remember { mutableStateOf<PartnerPronoun?>(null) }
     var startDate by remember { mutableStateOf(existingStart ?: LocalDate.now()) }
     var saving by remember { mutableStateOf(false) }
+    var saveFailed by remember { mutableStateOf(false) }
 
     LaunchedEffect(existingStart) { existingStart?.let { startDate = it } }
 
@@ -121,14 +122,18 @@ fun SetupFlowScreen(onDone: () -> Unit, modifier: Modifier = Modifier) {
 
             SetupStep.START_DATE -> StartDateStep(
                 startDate = startDate,
-                onDateChange = { startDate = it },
+                onDateChange = { startDate = it; saveFailed = false },
                 saving = saving,
+                saveFailed = saveFailed,
                 onFinish = {
                     saving = true
+                    saveFailed = false
                     scope.launch {
-                        Session.saveStartDate(startDate.toString())
+                        val saved = Session.saveStartDate(startDate.toString())
                         saving = false
-                        onDone()
+                        // Leaving without a saved date would bring this screen
+                        // straight back on the next launch, so stay and say so.
+                        if (saved) onDone() else saveFailed = true
                     }
                 },
             )
@@ -234,6 +239,7 @@ private fun StartDateStep(
     startDate: LocalDate,
     onDateChange: (LocalDate) -> Unit,
     saving: Boolean,
+    saveFailed: Boolean,
     onFinish: () -> Unit,
 ) {
     val pickerState = rememberDatePickerState(
@@ -318,6 +324,15 @@ private fun StartDateStep(
             style = IOSText.headline,
             color = Color.White,
         )
+
+        if (saveFailed) {
+            Text(
+                leylaString(R.string.setup_save_failed),
+                style = IOSText.footnote.weight(FontWeight.SemiBold),
+                color = Color.White,
+                textAlign = TextAlign.Center,
+            )
+        }
 
         Spacer(Modifier.size(12.dp))
         PrimaryButton(

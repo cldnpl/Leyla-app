@@ -20,6 +20,18 @@
         android:src="@drawable/ic_widget_heart"
         android:contentDescription="@string/widget_miss_you_action" />
 
+    <!-- Stands in for the day count for a few seconds after a heart tap. -->
+    <TextView
+        android:id="@+id/widget_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:maxLines="1"
+        android:visibility="gone" />
+
     <TextView
         android:id="@+id/widget_days"
         android:layout_width="wrap_content"

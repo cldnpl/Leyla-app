@@ -89,6 +89,7 @@ func run(logger *slog.Logger) error {
 		Logger: logger,
 		Store:  store.New(pool),
 		Apple:  auth.NewAppleVerifier(cfg.AppleClientIDs),
+		Google: auth.NewGoogleVerifier(cfg.GoogleClientIDs),
 		Push:   sender,
 		Mail:   mailer,
 		Media:  mediaStore,

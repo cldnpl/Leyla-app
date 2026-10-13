@@ -47,3 +47,6 @@ server/postgres-data/
 # ---- Editors ----
 .idea/
 .vscode/
+
+# Stale Next.js build caches (e.g. .next.codex-stale)
+landing/.next*/

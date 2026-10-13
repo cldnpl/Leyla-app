@@ -139,7 +139,7 @@
 		14BD834B6586444E318737FD /* DailyQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DailyQuizView.swift; sourceTree = "<group>"; };
 		19564A291FAFFE2898996196 /* UsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsApp.swift; sourceTree = "<group>"; };
 		19ED85B83760F7F1ABFA3444 /* DebateAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebateAPI.swift; sourceTree = "<group>"; };
-		2071C42DCA8081D35DA10B07 /* add-widget.mp4 */ = {isa = PBXFileReference; path = "add-widget.mp4"; sourceTree = "<group>"; };
+		2071C42DCA8081D35DA10B07 /* add-widget.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "add-widget.mp4"; sourceTree = "<group>"; };
 		20B33C72EEDBF3FE4B6CC419 /* JournalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JournalView.swift; sourceTree = "<group>"; };
 		21AF5B9D08AEFF02C55BA31A /* APIEndpoints.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIEndpoints.swift; sourceTree = "<group>"; };
 		22CA0D9F4FAC5B9076AE9D06 /* GameAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameAPI.swift; sourceTree = "<group>"; };
@@ -178,7 +178,7 @@
 		8F0563CFA8AE0A4EC03D8810 /* SharedAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedAPI.swift; sourceTree = "<group>"; };
 		90DEA62B27284E7FC247AA54 /* TogetherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TogetherView.swift; sourceTree = "<group>"; };
 		9146BDB029D9DF3EF27B17E8 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
-		9409C1C95F99042C49E96566 /* Us.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Us.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9409C1C95F99042C49E96566 /* Us.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Us.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		99784A6F3EA56FA49DECFE36 /* LanguagePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguagePickerView.swift; sourceTree = "<group>"; };
 		99F68175B16EDEE1A515FF7B /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		9D1A4F959F6DEB768E0009D1 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -188,7 +188,7 @@
 		A06860EBBD7BC666FC7C6245 /* TicTacToeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TicTacToeView.swift; sourceTree = "<group>"; };
 		A2C96B476E9EBDF82881E00B /* PairingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingView.swift; sourceTree = "<group>"; };
 		A4A69D0FEA5BD17F89E69409 /* LanguageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageManager.swift; sourceTree = "<group>"; };
-		A6AB46D7A68082C5C6C4C39E /* UsWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = UsWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		A6AB46D7A68082C5C6C4C39E /* UsWidgetExtension.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.extensionkit-extension"; name = UsWidgetExtension.appex; path = UsWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		A9CA7D83A660F5C36AD7E359 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		AC066EDB9AAF44FC8C216901 /* QuizModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuizModels.swift; sourceTree = "<group>"; };
 		AD69287FBB4543CE49DCE444 /* CycleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CycleManager.swift; sourceTree = "<group>"; };
@@ -740,6 +740,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.claudianapolitano.us;
 				PRODUCT_NAME = Us;
 				SDKROOT = iphoneos;
@@ -847,6 +848,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.claudianapolitano.us;
 				PRODUCT_NAME = Us;
 				SDKROOT = iphoneos;

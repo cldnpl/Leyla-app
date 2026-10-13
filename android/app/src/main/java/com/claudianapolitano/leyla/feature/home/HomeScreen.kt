@@ -33,6 +33,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import android.widget.Toast
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,6 +50,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.R
 import com.claudianapolitano.leyla.core.leylaString
+import com.claudianapolitano.leyla.designsystem.Avatar
 import com.claudianapolitano.leyla.designsystem.BrandLogo
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
@@ -81,9 +84,23 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) { viewModel.onAppear(context) }
 
+    // Resolved here because the toast fires outside composition, and the
+    // translated, pronoun-aware sentence can only be looked up in it.
+    val sentToast by rememberUpdatedState(leylaString(state.sentToastRes, state.partnerName))
+    LaunchedEffect(viewModel) {
+        viewModel.missYouSent.collect {
+            Toast.makeText(context, sentToast, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Box(modifier.fillMaxSize().background(colors.background)) {
         Column(Modifier.fillMaxSize()) {
-            HomeTopBar(onAddWidget = onAddWidget, onEditProfile = onEditProfile)
+            HomeTopBar(
+                avatarPath = state.myAvatarPath,
+                myName = state.myName,
+                onAddWidget = onAddWidget,
+                onEditProfile = onEditProfile,
+            )
             HomeContent(state, viewModel, onOpenMap = onOpenMap, onOpenCycle = onOpenCycle)
         }
     }
@@ -98,8 +115,14 @@ fun HomeScreen(
  * builds' chrome lines up.
  */
 @Composable
-private fun HomeTopBar(onAddWidget: () -> Unit, onEditProfile: () -> Unit) {
+private fun HomeTopBar(
+    avatarPath: String?,
+    myName: String,
+    onAddWidget: () -> Unit,
+    onEditProfile: () -> Unit,
+) {
     val colors = LeylaTheme.colors
+    val editProfileLabel = leylaString(R.string.edit_profile)
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -112,12 +135,25 @@ private fun HomeTopBar(onAddWidget: () -> Unit, onEditProfile: () -> Unit) {
             onClick = onEditProfile,
             modifier = Modifier.align(Alignment.CenterEnd),
         ) {
-            Icon(
-                Icons.Filled.AccountCircle,
-                contentDescription = leylaString(R.string.edit_profile),
-                tint = colors.ink,
-                modifier = Modifier.size(28.dp),
-            )
+            // Your own photo once you have one, so a change made in the profile
+            // editor shows up the moment you come back.
+            if (avatarPath != null) {
+                Avatar(
+                    path = avatarPath,
+                    name = myName,
+                    size = 32.dp,
+                    modifier = Modifier.semantics {
+                        contentDescription = editProfileLabel
+                    },
+                )
+            } else {
+                Icon(
+                    Icons.Filled.AccountCircle,
+                    contentDescription = editProfileLabel,
+                    tint = colors.ink,
+                    modifier = Modifier.size(28.dp),
+                )
+            }
         }
     }
 }

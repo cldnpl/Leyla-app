@@ -149,7 +149,7 @@ func (d Deps) handleLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if u.PasswordHash == nil {
-		writeError(w, http.StatusUnauthorized, "no_password", "this account uses Sign in with Apple")
+		writeError(w, http.StatusUnauthorized, "no_password", "this account signs in with Apple or Google")
 		return
 	}
 	ok, err := auth.VerifyPassword(req.Password, *u.PasswordHash)
@@ -212,6 +212,83 @@ func (d Deps) handleApple(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, http.StatusOK, resp)
+}
+
+// ---- Sign in with Google ----
+
+type googleRequest struct {
+	IDToken string `json:"idToken"`
+}
+
+func (d Deps) handleGoogle(w http.ResponseWriter, r *http.Request) {
+	var req googleRequest
+	if !decodeJSON(w, r, &req) {
+		return
+	}
+	if req.IDToken == "" {
+		writeError(w, http.StatusBadRequest, "missing_token", "idToken is required")
+		return
+	}
+	if d.Google == nil || !d.Google.Configured() {
+		writeError(w, http.StatusServiceUnavailable, "google_unconfigured",
+			"Google sign-in is not configured on this server")
+		return
+	}
+	id, err := d.Google.Verify(r.Context(), req.IDToken)
+	if err != nil {
+		writeError(w, http.StatusUnauthorized, "google_invalid", "could not verify Google ID token")
+		return
+	}
+
+	u, err := d.googleUser(r.Context(), id)
+	if err != nil {
+		d.serverError(w, "google: resolve user", err)
+		return
+	}
+	resp, err := d.issueTokens(r.Context(), u)
+	if err != nil {
+		d.serverError(w, "google: tokens", err)
+		return
+	}
+	writeJSON(w, http.StatusOK, resp)
+}
+
+// googleUser finds, links or creates the account behind a verified Google
+// identity.
+func (d Deps) googleUser(ctx context.Context, id auth.Identity) (store.User, error) {
+	u, err := d.Store.GetUserByGoogleID(ctx, id.Subject)
+	if err == nil {
+		return u, nil
+	}
+	if !errors.Is(err, store.ErrNotFound) {
+		return store.User{}, err
+	}
+
+	// Someone who registered with a password (or with Apple) and later taps
+	// Continue with Google is the same person: attach Google to the account
+	// they already have. Only a provider-verified address gets here — Identity
+	// drops an unverified one — so this cannot be used to walk into an account
+	// by claiming its address.
+	if id.Email != nil {
+		existing, lookupErr := d.Store.GetUserByEmail(ctx, *id.Email)
+		if lookupErr == nil {
+			return d.Store.LinkGoogleID(ctx, existing.ID, id.Subject)
+		}
+		if !errors.Is(lookupErr, store.ErrNotFound) {
+			return store.User{}, lookupErr
+		}
+	}
+
+	name := strings.TrimSpace(id.Name)
+	if name == "" {
+		name = "Partner"
+	}
+	sub := id.Subject
+	return d.Store.CreateUser(ctx, store.CreateUserParams{
+		Email:        id.Email,
+		GoogleUserID: &sub,
+		DisplayName:  name,
+	})
 }
 
 // ---- session lifecycle ----

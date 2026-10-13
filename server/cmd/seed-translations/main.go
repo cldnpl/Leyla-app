@@ -271,7 +271,7 @@ type anthropicResponse struct {
 	} `json:"usage"`
 }
 
-const systemPrompt = `You translate short strings for a couples app called "Us." — the tone is warm, playful, romantic, sometimes cheeky.
+const systemPrompt = `You translate short strings for a couples app called "Leyla" — the tone is warm, playful, romantic, sometimes cheeky.
 Input is a JSON array of items with "key" and "text" (English source).
 Output ONLY a JSON object whose keys are the input "key" values and whose values are the translated strings for the requested language. No prose, no markdown, no extra keys.
 Guidance:

@@ -6,14 +6,28 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 import android.widget.RemoteViews
+import android.widget.Toast
 import com.claudianapolitano.leyla.MainActivity
 import com.claudianapolitano.leyla.R
+import com.claudianapolitano.leyla.core.AppPrefs
 import com.claudianapolitano.leyla.core.LeylaApi
+import com.claudianapolitano.leyla.core.MissYouStatus
+import com.claudianapolitano.leyla.core.PartnerPrefs
+import com.claudianapolitano.leyla.core.PartnerPronoun
+import com.claudianapolitano.leyla.core.SharedConfig
 import com.claudianapolitano.leyla.core.WidgetStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.math.roundToInt
 
 /**
@@ -47,12 +61,65 @@ class LeylaWidget : AppWidgetProvider() {
         super.onReceive(context, intent)
         if (intent.action != ACTION_MISS_YOU) return
 
+        val snapshot = WidgetStore.load(context)
+        // A second tap while the first is still sending would just send twice.
+        if (snapshot.missYouStatus == MissYouStatus.SENDING) return
+
         // The tap is the whole point of the widget, so it must not wait for the
-        // app to open. A widget's onReceive gets ~10 seconds; one POST fits.
+        // app to open. goAsync keeps the process alive for the POST and the
+        // few seconds of "Sent ✓" — all inside the ~10 seconds a receiver gets,
+        // which is why the request is capped.
+        val pending = goAsync()
+        WidgetStore.saveMissYouStatus(MissYouStatus.SENDING, SEND_TIMEOUT_MS + STATUS_SHOWN_MS)
+        redraw(context)
         CoroutineScope(Dispatchers.IO).launch {
-            runCatching { LeylaApi.sendMissYou() }
+            try {
+                val sent = withTimeoutOrNull(SEND_TIMEOUT_MS) {
+                    runCatching {
+                        // The demo couple has no server row to send to.
+                        if (!(SharedConfig.DEMO_MODE && AppPrefs.testPaired)) LeylaApi.sendMissYou()
+                    }.isSuccess
+                } ?: false
+
+                // Said on the widget itself, which works whatever the
+                // notification setting — Android hides a background app's
+                // toast when its notifications are off.
+                WidgetStore.saveMissYouStatus(
+                    if (sent) MissYouStatus.SENT else MissYouStatus.FAILED,
+                    STATUS_SHOWN_MS,
+                )
+                redraw(context)
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, toastText(context, sent, snapshot.partnerName), Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                delay(STATUS_SHOWN_MS)
+                WidgetStore.saveMissYouStatus(null)
+                redraw(context)
+            } finally {
+                pending.finish()
+            }
         }
-        refresh(context)
+    }
+
+    /** Redraws in place — quicker than a refresh broadcast round trip. */
+    private fun redraw(context: Context) {
+        AppWidgetManager.getInstance(context)
+            .updateAppWidget(ComponentName(context, LeylaWidget::class.java), buildViews(context))
+    }
+
+    private fun toastText(context: Context, sent: Boolean, partnerName: String?): String {
+        if (!sent) return context.getString(R.string.widget_miss_you_failed)
+        val name = partnerName?.takeIf { it.isNotBlank() } ?: context.getString(R.string.your_partner)
+        return context.getString(
+            when (PartnerPrefs.pronoun) {
+                PartnerPronoun.SHE -> R.string.miss_you_toast_her
+                PartnerPronoun.HE -> R.string.miss_you_toast_him
+                PartnerPronoun.THEY -> R.string.miss_you_toast_them
+            },
+            name,
+        )
     }
 
     private fun buildViews(context: Context): RemoteViews {
@@ -65,6 +132,26 @@ class LeylaWidget : AppWidgetProvider() {
             days?.toString() ?: context.getString(R.string.widget_dash),
         )
         views.setTextViewText(R.id.widget_days_label, context.getString(R.string.widget_days_together))
+
+        // While a heart tap is in flight (and briefly after), its status takes
+        // the day count's place so the tap visibly did something.
+        val status = snapshot.missYouStatus
+        val showStatus = status != null
+        views.setViewVisibility(R.id.widget_status, if (showStatus) View.VISIBLE else View.GONE)
+        views.setViewVisibility(R.id.widget_days, if (showStatus) View.GONE else View.VISIBLE)
+        views.setViewVisibility(R.id.widget_days_label, if (showStatus) View.GONE else View.VISIBLE)
+        if (status != null) {
+            views.setTextViewText(
+                R.id.widget_status,
+                context.getString(
+                    when (status) {
+                        MissYouStatus.SENDING -> R.string.widget_sending
+                        MissYouStatus.SENT -> R.string.widget_sent
+                        MissYouStatus.FAILED -> R.string.widget_send_failed
+                    },
+                ),
+            )
+        }
 
         val km = snapshot.distanceKm
         views.setTextViewText(
@@ -111,6 +198,12 @@ class LeylaWidget : AppWidgetProvider() {
     companion object {
         private const val ACTION_MISS_YOU = "com.claudianapolitano.leyla.widget.MISS_YOU"
 
+        /** Long enough for a slow network, short enough to fit a receiver's budget. */
+        private const val SEND_TIMEOUT_MS = 6_000L
+
+        /** How long "Sent ✓" stays up before the day count comes back. */
+        private const val STATUS_SHOWN_MS = 2_500L
+
         /** Redraws every placed widget. Safe to call when none exist. */
         fun refresh(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
@@ -123,10 +216,39 @@ class LeylaWidget : AppWidgetProvider() {
         }
 
         /** Whether the person has actually placed one, which the guide asks. */
-        fun isPlaced(context: Context): Boolean =
+        fun isPlaced(context: Context): Boolean = placedCount(context) > 0
+
+        /** How many Leyla widgets are on the home screen right now. */
+        fun placedCount(context: Context): Int =
             AppWidgetManager.getInstance(context)
                 .getAppWidgetIds(ComponentName(context, LeylaWidget::class.java))
-                .isNotEmpty()
+                .size
+
+        /** Xiaomi, Redmi and POCO all run Xiaomi's launcher and permission model. */
+        fun isXiaomi(): Boolean =
+            Build.MANUFACTURER.equals("Xiaomi", ignoreCase = true) ||
+                Build.BRAND.lowercase() in setOf("xiaomi", "redmi", "poco")
+
+        /**
+         * Opens the screen where "Home screen shortcuts" can be turned on —
+         * Xiaomi's own permission editor when it exists, the standard app
+         * settings page otherwise.
+         */
+        fun openShortcutPermission(context: Context) {
+            val miui = Intent("miui.intent.action.APP_PERM_EDITOR")
+                .setClassName(
+                    "com.miui.securitycenter",
+                    "com.miui.permcenter.permissions.PermissionsEditorActivity",
+                )
+                .putExtra("extra_pkgname", context.packageName)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val fallback = Intent(
+                Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                Uri.fromParts("package", context.packageName, null),
+            ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            runCatching { context.startActivity(miui) }
+                .onFailure { runCatching { context.startActivity(fallback) } }
+        }
 
         /**
          * Whether this launcher lets an app ask for the widget to be pinned.

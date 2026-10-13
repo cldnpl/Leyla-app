@@ -17,6 +17,7 @@ type User struct {
 	Email          *string
 	PasswordHash   *string
 	AppleUserID    *string
+	GoogleUserID   *string
 	DisplayName    string
 	AvatarPath     *string
 	Birthday       *time.Time
@@ -33,14 +34,15 @@ type CreateUserParams struct {
 	Email        *string
 	PasswordHash *string
 	AppleUserID  *string
+	GoogleUserID *string
 	DisplayName  string
 }
 
-const userCols = `id, email, password_hash, apple_user_id, display_name, avatar_path, birthday, partner_pronoun, email_verified, has_cycle, cycle_share_level, created_at, updated_at`
+const userCols = `id, email, password_hash, apple_user_id, google_user_id, display_name, avatar_path, birthday, partner_pronoun, email_verified, has_cycle, cycle_share_level, created_at, updated_at`
 
 func scanUser(row pgx.Row) (User, error) {
 	var u User
-	err := row.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.AppleUserID, &u.DisplayName,
+	err := row.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.AppleUserID, &u.GoogleUserID, &u.DisplayName,
 		&u.AvatarPath, &u.Birthday, &u.PartnerPronoun, &u.EmailVerified,
 		&u.HasCycle, &u.CycleShareLevel, &u.CreatedAt, &u.UpdatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
@@ -51,10 +53,10 @@ func scanUser(row pgx.Row) (User, error) {
 
 func (s *Store) CreateUser(ctx context.Context, p CreateUserParams) (User, error) {
 	return scanUser(s.pool.QueryRow(ctx,
-		`INSERT INTO users (email, password_hash, apple_user_id, display_name)
-		 VALUES ($1, $2, $3, $4)
+		`INSERT INTO users (email, password_hash, apple_user_id, google_user_id, display_name)
+		 VALUES ($1, $2, $3, $4, $5)
 		 RETURNING `+userCols,
-		p.Email, p.PasswordHash, p.AppleUserID, p.DisplayName))
+		p.Email, p.PasswordHash, p.AppleUserID, p.GoogleUserID, p.DisplayName))
 }
 
 func (s *Store) GetUserByID(ctx context.Context, id string) (User, error) {
@@ -67,6 +69,20 @@ func (s *Store) GetUserByEmail(ctx context.Context, email string) (User, error) 
 
 func (s *Store) GetUserByAppleID(ctx context.Context, appleID string) (User, error) {
 	return scanUser(s.pool.QueryRow(ctx, `SELECT `+userCols+` FROM users WHERE apple_user_id = $1`, appleID))
+}
+
+func (s *Store) GetUserByGoogleID(ctx context.Context, googleID string) (User, error) {
+	return scanUser(s.pool.QueryRow(ctx, `SELECT `+userCols+` FROM users WHERE google_user_id = $1`, googleID))
+}
+
+// LinkGoogleID attaches a Google account to a user who signed up another way,
+// so signing in with Google lands on the account they already have rather than
+// silently starting a second one on the same address.
+func (s *Store) LinkGoogleID(ctx context.Context, userID, googleID string) (User, error) {
+	return scanUser(s.pool.QueryRow(ctx,
+		`UPDATE users SET google_user_id = $2, updated_at = now()
+		 WHERE id = $1
+		 RETURNING `+userCols, userID, googleID))
 }
 
 // UpdateUserProfileParams carries a partial profile update: every field is a
