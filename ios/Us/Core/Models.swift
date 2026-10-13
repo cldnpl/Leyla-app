@@ -12,14 +12,10 @@ struct User: Codable, Identifiable, Equatable {
     /// Whether the address was confirmed with a code we emailed to it.
     /// Optional so sessions cached by older builds still decode.
     let emailVerified: Bool?
-    /// Account-level cycle settings, kept server-side so they survive a
-    /// reinstall. `hasCycle` is nil when the question was never answered.
-    let hasCycle: Bool?
-    let cycleShareLevel: String?
 
     init(id: String, email: String?, displayName: String, avatarPath: String?,
          birthday: Date?, partnerPronoun: String?, createdAt: Date,
-         emailVerified: Bool? = nil, hasCycle: Bool? = nil, cycleShareLevel: String? = nil) {
+         emailVerified: Bool? = nil) {
         self.id = id
         self.email = email
         self.displayName = displayName
@@ -28,8 +24,6 @@ struct User: Codable, Identifiable, Equatable {
         self.partnerPronoun = partnerPronoun
         self.createdAt = createdAt
         self.emailVerified = emailVerified
-        self.hasCycle = hasCycle
-        self.cycleShareLevel = cycleShareLevel
     }
 }
 
@@ -134,27 +128,6 @@ struct PartnerLocation: Codable {
     let lat: Double?
     let lng: Double?
     let mode: String?
-    let partnerName: String?
-    let updatedAt: Date?
-}
-
-/// The partner's opt-in shared cycle summary, or `{sharing:false}`. Coarse by
-/// design: a phase, and optionally a day count — never raw symptoms.
-struct PartnerCycle: Codable {
-    let sharing: Bool
-    let phase: String?
-    let cycleDay: Int?
-    let periodInDays: Int?
-    let note: String?
-    let partnerName: String?
-    let updatedAt: Date?
-}
-
-/// The partner's opt-in shared due date, or `{sharing:false}`. Week, trimester,
-/// and countdown are derived on the client.
-struct PartnerPregnancy: Codable {
-    let sharing: Bool
-    let dueDate: Date?
     let partnerName: String?
     let updatedAt: Date?
 }

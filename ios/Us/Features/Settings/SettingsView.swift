@@ -1,7 +1,7 @@
 import SwiftUI
 import UserNotifications
 
-/// Root Settings screen. Each domain (profile, relationship, health, …) lives
+/// Root Settings screen. Each domain (profile, relationship, …) lives
 /// in its own dedicated page so the top-level list stays scannable.
 struct SettingsView: View {
     @EnvironmentObject var session: Session
@@ -28,17 +28,6 @@ struct SettingsView: View {
                         } icon: {
                             Image(systemName: "heart.fill")
                                 .foregroundStyle(Theme.rose)
-                        }
-                    }
-                    NavigationLink { AppleHealthSettingsView() } label: {
-                        Label {
-                            Text(loc: "Apple Health")
-                        } icon: {
-                            // The system red-heart glyph mirrors the Apple
-                            // Health app icon so the row is instantly
-                            // recognisable next to Profile / Relationship.
-                            Image(systemName: "heart.text.square.fill")
-                                .foregroundStyle(.red)
                         }
                     }
                 }
@@ -210,40 +199,6 @@ struct RelationshipSettingsView: View {
         return max(0, cal.dateComponents([.day],
                                          from: cal.startOfDay(for: startDate),
                                          to: cal.startOfDay(for: Date())).day ?? 0)
-    }
-}
-
-// MARK: - Apple Health
-
-/// HealthKit connection status + entry point into the Health app.
-struct AppleHealthSettingsView: View {
-    @ObservedObject private var cycle = CycleManager.shared
-
-    var body: some View {
-        Form {
-            Section {
-                LabeledContent("Apple Health".loc) {
-                    Text(cycle.isHealthConnected ? "Connected" : "Not connected")
-                        .foregroundStyle(.secondary)
-                }
-                if cycle.userHasCycle == true, !cycle.isHealthConnected, HealthKitManager.shared.isAvailable {
-                    Button {
-                        Task { await cycle.connectHealth() }
-                    } label: {
-                        Label(loc: "Connect Apple Health", systemImage: "heart.text.square.fill")
-                    }
-                }
-                Link(destination: AppleHealth.appURL) {
-                    Label(loc: "Open the Health app", systemImage: "arrow.up.forward.app")
-                }
-            } header: {
-                Text(loc: "Apple Health integration")
-            } footer: {
-                Text(loc: "Leyla uses Apple's HealthKit framework to read your menstrual cycle data from the Apple Health app, with your permission, so it can show your current phase, cycle day and next-period estimate in the Cycle screen. It is read-only — Leyla never writes to Health and never uploads your health data. You can review or revoke access anytime in Health ▸ Sharing ▸ Apps, or in Settings ▸ Privacy & Security ▸ Health ▸ Leyla.")
-            }
-        }
-        .navigationTitle(Text(loc: "Apple Health"))
-        .navigationBarTitleDisplayMode(.inline)
     }
 }
 

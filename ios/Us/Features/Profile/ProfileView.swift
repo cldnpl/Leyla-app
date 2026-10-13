@@ -22,7 +22,6 @@ struct ProfileEditorSheet: View {
 /// Dedicated account editor presented as its own page, not inline in Settings.
 struct ProfileEditView: View {
     @EnvironmentObject var session: Session
-    @ObservedObject private var cycle = CycleManager.shared
     @State private var nameDraft = ""
     @FocusState private var nameFocused: Bool
     @State private var showEmailChange = false
@@ -103,17 +102,6 @@ struct ProfileEditView: View {
                 .tint(.primary)
             } header: {
                 Text(loc: "Profile")
-            }
-
-            Section {
-                Toggle("I have a menstrual cycle".loc, isOn: Binding(
-                    get: { cycle.userHasCycle == true },
-                    set: { cycle.setUserHasCycle($0) }
-                ))
-            } header: {
-                Text(loc: "You")
-            } footer: {
-                Text(loc: "Off if you're supporting a partner who has one.")
             }
         }
         .navigationTitle(Text(loc: "Edit"))

@@ -54,7 +54,6 @@ final class Session: ObservableObject {
         do {
             user = try await APIClient.shared.me()
             syncPronounFromServer()
-            syncCycleSettingsFromServer()
             try await refreshCouple()
             await PushManager.shared.onAuthenticated()
             connectRealtime()
@@ -95,7 +94,6 @@ final class Session: ObservableObject {
         do {
             user = try await APIClient.shared.me()
             syncPronounFromServer()
-            syncCycleSettingsFromServer()
             try await refreshCouple()
             await PushManager.shared.onAuthenticated()
             connectRealtime()
@@ -195,7 +193,6 @@ final class Session: ObservableObject {
     /// widget so a renamed user doesn't linger anywhere.
     func applyUpdatedUser(_ updated: User) {
         user = updated
-        CycleManager.shared.adoptServerSettings(from: updated)
         if let couple { SessionCache.save(user: updated, partner: partner, couple: couple) }
         updateWidget()
     }
@@ -210,7 +207,6 @@ final class Session: ObservableObject {
         guard state == .ready else { return }
         if let fresh = try? await APIClient.shared.me() {
             user = fresh
-            CycleManager.shared.adoptServerSettings(from: fresh)
         }
         try? await refreshCouple()
     }
@@ -219,7 +215,6 @@ final class Session: ObservableObject {
         TokenStore.save(accessToken: resp.accessToken, refreshToken: resp.refreshToken)
         user = resp.user
         syncPronounFromServer()
-        syncCycleSettingsFromServer()
         await loadCouple()
         await PushManager.shared.onAuthenticated()
         connectRealtime()
@@ -236,13 +231,6 @@ final class Session: ObservableObject {
         SessionCache.clear()
         UserDefaults.standard.set(false, forKey: "testPaired")
         UserDefaults.standard.removeObject(forKey: "testStartDate")
-        // Drop what belonged to the account (the partner's shared cycle) but
-        // deliberately keep this iPhone's own cycle state: the Apple Health
-        // connection, the dates read from it, and the "do you have a cycle?"
-        // answer. They are device-level — iOS never revokes Health access on
-        // sign-out, and it only ever shows the permission sheet once — so
-        // clearing them would leave the user with no way to get her cycle back.
-        CycleManager.shared.forgetPartnerData()
         user = nil
         partner = nil
         couple = nil
@@ -286,14 +274,6 @@ final class Session: ObservableObject {
             // Existing user: server doesn't have it yet, but we do → back it up.
             Task { try? await APIClient.shared.updatePartnerPronoun(local.rawValue) }
         }
-    }
-
-    /// Reconcile the cycle settings with the server after login. The server is
-    /// authoritative once it has an answer; a local-only answer from a build
-    /// that predates server storage is pushed up so it isn't lost.
-    private func syncCycleSettingsFromServer() {
-        guard let user else { return }
-        CycleManager.shared.adoptServerSettings(from: user)
     }
 
     /// Saves the couple's start date and refreshes the couple + widget.

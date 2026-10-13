@@ -54,7 +54,7 @@ struct WelcomeView: View {
     }
 }
 
-/// The swipeable 4-page intro (icon + title + subtitle) with animated page dots.
+/// The swipeable 3-page intro (icon + title + subtitle) with animated page dots.
 /// Reused as the first step of onboarding so every new member sees the welcome.
 struct IntroCarousel: View {
     @State private var page = 0
@@ -98,9 +98,6 @@ struct IntroPage: Identifiable {
         .init(symbol: "map.fill",
               title: "Share your world",
               subtitle: "Watch the distance between you shrink, share moments, and count down to reunions."),
-        .init(symbol: "heart.text.square.fill",
-              title: "Care for each other",
-              subtitle: "Cycle-aware tips so you always know how to show up for each other."),
     ]
 }
 

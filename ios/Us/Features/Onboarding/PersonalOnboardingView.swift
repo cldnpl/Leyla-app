@@ -13,7 +13,7 @@ struct PersonalOnboardingView: View {
     @State private var name = ""
     @State private var saving = false
 
-    enum Step { case welcome, name, cycle, location }
+    enum Step { case welcome, name, location }
 
     var body: some View {
         ZStack {
@@ -22,7 +22,6 @@ struct PersonalOnboardingView: View {
                 switch step {
                 case .welcome: welcomeStep
                 case .name: nameStep
-                case .cycle: cycleStep
                 case .location: locationStep
                 }
             }
@@ -38,8 +37,7 @@ struct PersonalOnboardingView: View {
     private var stepIndex: Int {
         switch step {
         case .welcome, .name: return 0
-        case .cycle: return 1
-        case .location: return 2
+        case .location: return 1
         }
     }
 
@@ -58,7 +56,7 @@ struct PersonalOnboardingView: View {
 
     private var stepDots: some View {
         HStack(spacing: 8) {
-            ForEach(0..<3, id: \.self) { i in
+            ForEach(0..<2, id: \.self) { i in
                 Capsule()
                     .fill(.white.opacity(i == stepIndex ? 1 : 0.4))
                     .frame(width: i == stepIndex ? 20 : 7, height: 7)
@@ -113,55 +111,10 @@ struct PersonalOnboardingView: View {
         saving = true
         await session.updateName(trimmedName)
         saving = false
-        withAnimation { step = .cycle }
-    }
-
-    // MARK: - Step 2 · Cycle
-
-    private var cycleStep: some View {
-        VStack(spacing: 22) {
-            Spacer()
-            Image(systemName: "heart.circle.fill")
-                .font(.system(size: 60)).foregroundStyle(.white)
-            VStack(spacing: 10) {
-                Text(loc: "Do you have a\nmenstrual cycle?")
-                    .font(.system(.largeTitle, design: .rounded).bold())
-                    .foregroundStyle(.white)
-                    .multilineTextAlignment(.center)
-                Text(loc: "This tailors Leyla for you — track your own cycle, or get gentle tips to support your partner's. You can change it anytime.")
-                    .font(.subheadline)
-                    .foregroundStyle(.white.opacity(0.95))
-                    .multilineTextAlignment(.center)
-                // Says up front that cycle tracking is powered by Apple Health.
-                Label(loc: "If you do, Leyla reads your cycle from Apple Health — only after you allow it. Nothing is written to Health.", systemImage: "heart.text.square.fill")
-                    .font(.footnote)
-                    .foregroundStyle(.white.opacity(0.9))
-                    .multilineTextAlignment(.leading)
-                    .padding(.top, 2)
-            }
-            Spacer()
-
-            VStack(spacing: 12) {
-                Button { chooseCycle(true) } label: { Text(loc: "Yes, I do") }
-                    .buttonStyle(PrimaryButtonStyle())
-                Button { chooseCycle(false) } label: {
-                    Text(loc: "No, I don't")
-                        .font(.headline).foregroundStyle(.white)
-                        .frame(maxWidth: .infinity).padding(.vertical, 16)
-                        .background(.white.opacity(0.18), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-            }
-        }
-        .padding(28)
-    }
-
-    private func chooseCycle(_ hasCycle: Bool) {
-        Haptics.tap()
-        CycleManager.shared.setUserHasCycle(hasCycle)
         withAnimation { step = .location }
     }
 
-    // MARK: - Step 3 · Location
+    // MARK: - Step 2 · Location
 
     private var locationStep: some View {
         VStack(spacing: 22) {

@@ -37,14 +37,6 @@ extension APIClient {
         try await send("/v1/me", method: "PATCH", body: ["partnerPronoun": pronoun])
     }
 
-    /// Persist the account-level cycle settings so they survive a reinstall.
-    @discardableResult
-    func updateCycleSettings(hasCycle: Bool? = nil, shareLevel: String? = nil) async throws -> User {
-        struct Body: Encodable { let hasCycle: Bool?; let cycleShareLevel: String? }
-        return try await send("/v1/me", method: "PATCH",
-                              body: Body(hasCycle: hasCycle, cycleShareLevel: shareLevel))
-    }
-
     // MARK: - Avatar
 
     /// Uploads a new profile photo. The server saves it, sets `avatarPath` on
@@ -215,39 +207,5 @@ extension APIClient {
 
     func partnerLocation() async throws -> PartnerLocation {
         try await send("/v1/location")
-    }
-
-    // MARK: - Cycle sharing
-
-    /// Upload the caller's opt-in cycle summary. `note` carries the day's
-    /// thoughts when sharing at the "cycle + thoughts" level (nil otherwise).
-    func putCycle(phase: String, cycleDay: Int?, periodInDays: Int?, note: String?) async throws {
-        struct Body: Encodable { let phase: String; let cycleDay: Int?; let periodInDays: Int?; let note: String? }
-        try await sendVoid("/v1/cycle", method: "PUT",
-                           body: Body(phase: phase, cycleDay: cycleDay, periodInDays: periodInDays, note: note))
-    }
-
-    func partnerCycle() async throws -> PartnerCycle {
-        try await send("/v1/cycle")
-    }
-
-    func stopSharingCycle() async throws {
-        try await sendVoid("/v1/cycle", method: "DELETE")
-    }
-
-    // MARK: - Pregnancy sharing
-
-    func putPregnancy(dueDate: Date) async throws {
-        let iso = dueDate.formatted(.iso8601.year().month().day().dateSeparator(.dash))
-        struct Body: Encodable { let dueDate: String }
-        try await sendVoid("/v1/pregnancy", method: "PUT", body: Body(dueDate: iso))
-    }
-
-    func partnerPregnancy() async throws -> PartnerPregnancy {
-        try await send("/v1/pregnancy")
-    }
-
-    func stopSharingPregnancy() async throws {
-        try await sendVoid("/v1/pregnancy", method: "DELETE")
     }
 }

@@ -10,7 +10,6 @@ private let samplePartnerCoord = CLLocationCoordinate2D(latitude: 41.2995, longi
 struct HomeView: View {
     @EnvironmentObject var session: Session
     @StateObject private var location = LocationManager.shared
-    @StateObject private var cycle = CycleManager.shared
 
     @State private var missYouSent = false
     @State private var isSending = false
@@ -40,20 +39,18 @@ struct HomeView: View {
             .sheet(isPresented: $showAddWidget) { AddWidgetGuideView() }
             .task(id: session.remoteChangeID) { await loadPartnerLocation() }
             .task { await pollPartnerLocation() }
-            .task { await cycle.refreshOnAppear() }
             .refreshable { await loadPartnerLocation() }
             .onReceive(location.$currentLocation) { _ in publishDistance() }
         }
     }
 
-    // MARK: - Layout: hero → map → cycle
+    // MARK: - Layout: hero → map
 
     private var content: some View {
         ScrollView {
             VStack(spacing: 18) {
                 heroButton.padding(.top, 28)
                 mapSection
-                cycleCards
                 if let errorMessage {
                     Text(errorMessage).font(.footnote).foregroundStyle(.red)
                         .multilineTextAlignment(.center)
@@ -106,49 +103,6 @@ struct HomeView: View {
             .background(Theme.rose.opacity(0.15), in: Capsule())
         }
         .accessibilityLabel("Add widget")
-    }
-
-    // MARK: - Cycle cards (partner's shared cycle + your own, when available)
-
-    @ViewBuilder
-    private var cycleCards: some View {
-        if cycle.userHasCycle == true, cycle.isPregnant, let pg = cycle.pregnancyInsights {
-            // She's tracking a pregnancy → show that instead of the cycle.
-            NavigationLink { CycleDetailView() } label: {
-                PregnancyHomeCard(insights: pg, title: "Your pregnancy")
-            }
-            .buttonStyle(.plain)
-        } else if cycle.userHasCycle == false,
-                  let pgp = cycle.partnerPregnancy, pgp.sharing, let due = pgp.dueDate {
-            // His partner is expecting and sharing it.
-            NavigationLink { CycleDetailView() } label: {
-                PregnancyHomeCard(insights: PregnancyEngine.insights(dueDate: due),
-                                  title: "\(partnerName) is expecting")
-            }
-            .buttonStyle(.plain)
-        } else {
-            switch cycle.userHasCycle {
-            case .some(false):
-                // He doesn't have a cycle → her current phase + supportive tips.
-                NavigationLink { CycleDetailView() } label: {
-                    PartnerPeriodCard(partner: cycle.partner, partnerName: partnerName)
-                }
-                .buttonStyle(.plain)
-            case .some(true):
-                // She has a cycle → her own tracking (connect Health, then insights).
-                if let insights = cycle.insights {
-                    NavigationLink { CycleDetailView() } label: { SelfCycleCard(insights: insights) }
-                        .buttonStyle(.plain)
-                } else {
-                    NavigationLink { CycleDetailView() } label: { CycleSetupCard() }
-                        .buttonStyle(.plain)
-                }
-            case nil:
-                // Not answered yet (existing users) → neutral entry to the question.
-                NavigationLink { CycleDetailView() } label: { CycleSetupCard() }
-                    .buttonStyle(.plain)
-            }
-        }
     }
 
     // MARK: - Map section (tap to expand)
