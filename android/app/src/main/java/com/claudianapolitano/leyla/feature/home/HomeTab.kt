@@ -32,14 +32,12 @@ import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.designsystem.weight
-import com.claudianapolitano.leyla.feature.cycle.CycleDetailScreen
 import com.claudianapolitano.leyla.feature.map.PartnerMapScreen
 import com.claudianapolitano.leyla.feature.profile.ProfileEditScreen
 
 /**
- * Home's own navigation stack — the map, the profile editor and the cycle
- * screen all push from here, the way iOS's `NavigationStack` around `HomeView`
- * pushes them.
+ * Home's own navigation stack — the map and the profile editor both push from
+ * here, the way iOS's `NavigationStack` around `HomeView` pushes them.
  *
  * Home itself draws its own chrome (logo, widget pill, profile button), so the
  * bar only appears once something is pushed on top of it.
@@ -48,7 +46,6 @@ object HomeRoutes {
     const val ROOT = "home/root"
     const val MAP = "home/map"
     const val PROFILE = "home/profile"
-    const val CYCLE = "home/cycle"
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +59,6 @@ fun HomeTab(modifier: Modifier = Modifier, navController: NavHostController = re
     val title = when (route) {
         HomeRoutes.MAP -> leylaString(R.string.map_title)
         HomeRoutes.PROFILE -> leylaString(R.string.profile_title)
-        HomeRoutes.CYCLE -> leylaString(R.string.cycle_title)
         else -> null
     }
 
@@ -102,12 +98,10 @@ fun HomeTab(modifier: Modifier = Modifier, navController: NavHostController = re
                         onAddWidget = { showWidgetGuide = true },
                         onEditProfile = { navController.navigate(HomeRoutes.PROFILE) },
                         onOpenMap = { navController.navigate(HomeRoutes.MAP) },
-                        onOpenCycle = { navController.navigate(HomeRoutes.CYCLE) },
                     )
                 }
                 composable(HomeRoutes.MAP) { PartnerMapScreen() }
                 composable(HomeRoutes.PROFILE) { ProfileEditScreen() }
-                composable(HomeRoutes.CYCLE) { CycleDetailScreen() }
             }
         }
     }

@@ -60,10 +60,6 @@ object LeylaApi {
     suspend fun updatePartnerPronoun(pronoun: String): User =
         ApiClient.send("/v1/me", HttpMethod.Patch, UpdatePronounBody(pronoun))
 
-    /** Persists the account-level cycle settings so they survive a reinstall. */
-    suspend fun updateCycleSettings(hasCycle: Boolean? = null, shareLevel: String? = null): User =
-        ApiClient.send("/v1/me", HttpMethod.Patch, UpdateCycleSettingsBody(hasCycle, shareLevel))
-
     /**
      * Uploads a new profile photo. The server saves it, sets `avatarPath` on the
      * account and hands back the updated user.
@@ -158,32 +154,6 @@ object LeylaApi {
 
     /** Removes one photo. The server only lets its uploader do this. */
     suspend fun deletePhoto(id: String) = ApiClient.sendVoid("/v1/media/$id", HttpMethod.Delete)
-
-    // MARK: - Cycle / pregnancy sharing
-
-    suspend fun partnerCycle(): PartnerCycle = ApiClient.get("/v1/cycle")
-
-    suspend fun partnerPregnancy(): PartnerPregnancy = ApiClient.get("/v1/pregnancy")
-
-    /**
-     * Publishes the coarse cycle summary the chosen sharing level allows. Only
-     * ever the phase, the day and a countdown — never raw symptoms, and never
-     * the dates read from Health Connect.
-     */
-    suspend fun putCycle(phase: String, cycleDay: Int, periodInDays: Int, note: String?) =
-        ApiClient.sendVoid(
-            "/v1/cycle",
-            HttpMethod.Put,
-            UpdateCycleBody(phase, cycleDay, periodInDays, note),
-        )
-
-    /** Withdraws the shared summary, leaving the partner with nothing to see. */
-    suspend fun stopSharingCycle() = ApiClient.sendVoid("/v1/cycle", HttpMethod.Delete)
-
-    suspend fun putPregnancy(dueDate: String) =
-        ApiClient.sendVoid("/v1/pregnancy", HttpMethod.Put, UpdatePregnancyBody(dueDate))
-
-    suspend fun stopSharingPregnancy() = ApiClient.sendVoid("/v1/pregnancy", HttpMethod.Delete)
 }
 
 @kotlinx.serialization.Serializable
@@ -215,20 +185,6 @@ data class ConfirmEmailChangeBody(val code: String)
 
 @kotlinx.serialization.Serializable
 data class UpdatePronounBody(val partnerPronoun: String)
-
-@kotlinx.serialization.Serializable
-data class UpdateCycleSettingsBody(val hasCycle: Boolean?, val cycleShareLevel: String?)
-
-@kotlinx.serialization.Serializable
-data class UpdateCycleBody(
-    val phase: String,
-    val cycleDay: Int,
-    val periodInDays: Int,
-    val note: String?,
-)
-
-@kotlinx.serialization.Serializable
-data class UpdatePregnancyBody(val dueDate: String)
 
 @kotlinx.serialization.Serializable
 data class CreateJournalBody(val date: String, val body: String)

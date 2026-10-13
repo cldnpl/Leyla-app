@@ -57,13 +57,9 @@ import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.designsystem.softShadow
 import com.claudianapolitano.leyla.designsystem.weight
-import com.claudianapolitano.leyla.feature.cycle.CycleSetupCard
-import com.claudianapolitano.leyla.feature.cycle.PartnerPeriodCard
-import com.claudianapolitano.leyla.feature.cycle.PregnancyHomeCard
-import com.claudianapolitano.leyla.feature.cycle.SelfCycleCard
 
 /**
- * Home: hero → map → cycle. Port of `Us/Features/Home/HomeView.swift`.
+ * Home: hero → map. Port of `Us/Features/Home/HomeView.swift`.
  *
  * The destinations it reaches live in [com.claudianapolitano.leyla.feature.home.HomeTab],
  * which owns the stack — this screen only says which one was asked for, the way
@@ -74,7 +70,6 @@ fun HomeScreen(
     onAddWidget: () -> Unit,
     onEditProfile: () -> Unit,
     onOpenMap: () -> Unit,
-    onOpenCycle: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
 ) {
@@ -101,7 +96,7 @@ fun HomeScreen(
                 onAddWidget = onAddWidget,
                 onEditProfile = onEditProfile,
             )
-            HomeContent(state, viewModel, onOpenMap = onOpenMap, onOpenCycle = onOpenCycle)
+            HomeContent(state, viewModel, onOpenMap = onOpenMap)
         }
     }
 }
@@ -163,7 +158,6 @@ private fun HomeContent(
     state: HomeUiState,
     viewModel: HomeViewModel,
     onOpenMap: () -> Unit,
-    onOpenCycle: () -> Unit,
 ) {
     val colors = LeylaTheme.colors
     Column(
@@ -184,8 +178,6 @@ private fun HomeContent(
         )
 
         MapSection(state, onOpenMap = onOpenMap)
-
-        CycleSection(state, onOpenCycle = onOpenCycle)
 
         state.errorMessage?.let { message ->
             Text(
@@ -325,49 +317,5 @@ private fun ShareLocationCard(partnerName: String, onClick: () -> Unit) {
                 textAlign = TextAlign.Center,
             )
         }
-    }
-}
-
-// MARK: - Cycle cards (partner's shared cycle + your own, when available)
-
-@Composable
-private fun CycleSection(state: HomeUiState, onOpenCycle: () -> Unit) {
-    val clickable = Modifier.clickable(
-        interactionSource = remember { MutableInteractionSource() },
-        indication = null,
-        onClick = onOpenCycle,
-    )
-    val cycle = state.cycle
-    when {
-        // She's tracking a pregnancy → show that instead of the cycle.
-        cycle.userHasCycle == true && cycle.isPregnant && cycle.pregnancyInsights != null ->
-            PregnancyHomeCard(
-                insights = cycle.pregnancyInsights,
-                title = leylaString(R.string.pregnancy_yours),
-                modifier = clickable,
-            )
-
-        // His partner is expecting and sharing it.
-        cycle.userHasCycle == false && state.partnerPregnancyInsights != null ->
-            PregnancyHomeCard(
-                insights = state.partnerPregnancyInsights,
-                title = leylaString(R.string.pregnancy_partner_expecting, state.partnerName),
-                modifier = clickable,
-            )
-
-        // He doesn't have a cycle → her current phase + supportive tips.
-        cycle.userHasCycle == false ->
-            PartnerPeriodCard(
-                partner = cycle.partner,
-                partnerName = state.partnerName,
-                modifier = clickable,
-            )
-
-        // She has a cycle → her own tracking (connect Health, then insights).
-        cycle.userHasCycle == true && cycle.insights != null ->
-            SelfCycleCard(insights = cycle.insights, modifier = clickable)
-
-        // Not answered yet (existing users) → neutral entry to the question.
-        else -> CycleSetupCard(modifier = clickable)
     }
 }

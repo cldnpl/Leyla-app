@@ -67,7 +67,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.claudianapolitano.leyla.BuildConfig
 import com.claudianapolitano.leyla.R
 import com.claudianapolitano.leyla.core.leylaString
-import com.claudianapolitano.leyla.core.HealthConnectManager
 import com.claudianapolitano.leyla.core.LeylaApi
 import com.claudianapolitano.leyla.core.PartnerPrefs
 import com.claudianapolitano.leyla.core.PartnerPronoun
@@ -77,8 +76,6 @@ import com.claudianapolitano.leyla.designsystem.LeylaCard
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.designsystem.weight
-import com.claudianapolitano.leyla.feature.cycle.CycleState
-import com.claudianapolitano.leyla.feature.cycle.HealthConnect
 import com.claudianapolitano.leyla.feature.premium.PremiumStore
 import com.claudianapolitano.leyla.feature.together.TextAction
 import com.claudianapolitano.leyla.feature.together.plainClickable
@@ -91,7 +88,7 @@ import java.time.format.FormatStyle
 import java.time.temporal.ChronoUnit
 
 /**
- * Root Settings screen. Each domain (profile, relationship, health, …) lives in
+ * Root Settings screen. Each domain (profile, relationship, language, …) lives in
  * its own page so the top-level list stays scannable. Port of
  * `Us/Features/Settings/SettingsView.swift`.
  *
@@ -100,7 +97,6 @@ import java.time.temporal.ChronoUnit
 fun SettingsScreen(
     onOpenProfile: () -> Unit,
     onOpenRelationship: () -> Unit,
-    onOpenHealth: () -> Unit,
     onOpenLanguage: () -> Unit,
     onOpenPremium: () -> Unit,
     onOpenAccount: () -> Unit,
@@ -158,13 +154,6 @@ fun SettingsScreen(
                 tint = Theme.rose,
                 title = leylaString(R.string.settings_relationship),
                 onClick = onOpenRelationship,
-            )
-            HorizontalDivider(color = colors.hairline)
-            SettingsRow(
-                icon = Icons.Filled.MonitorHeart,
-                tint = Color(0xFFE5484D),
-                title = leylaString(R.string.health_source),
-                onClick = onOpenHealth,
             )
         }
 
@@ -357,67 +346,6 @@ private val PartnerPronoun.labelRes: Int
         PartnerPronoun.HE -> R.string.pronoun_he
         PartnerPronoun.THEY -> R.string.pronoun_they
     }
-
-// MARK: - Health Connect
-
-/** Connection status plus the way into Health Connect. Port of `AppleHealthSettingsView`. */
-@Composable
-fun HealthSettingsScreen(modifier: Modifier = Modifier) {
-    val colors = LeylaTheme.colors
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val cycle by CycleState.snapshot.collectAsStateWithLifecycle()
-
-    val permissionLauncher = rememberLauncherForActivityResult(
-        HealthConnectManager.requestPermissionsContract(),
-    ) { scope.launch { CycleState.onPermissionResult(context) } }
-
-    LaunchedEffect(Unit) { CycleState.refreshOnAppear(context) }
-
-    // Same gate as iOS: only offer the connect button to someone who tracks a
-    // cycle, on a device that can do it, who hasn't granted it yet.
-    val canConnect = cycle.userHasCycle == true &&
-        !cycle.healthConnected &&
-        cycle.healthAvailability == HealthConnectManager.Availability.AVAILABLE
-
-    SettingsPage(modifier) {
-        SectionHeader(leylaString(R.string.settings_health_section))
-        SettingsGroup {
-            LabeledValue(
-                leylaString(R.string.health_source),
-                leylaString(
-                    if (cycle.healthConnected) R.string.health_connected else R.string.health_not_connected,
-                ),
-            )
-            if (canConnect) {
-                HorizontalDivider(color = colors.hairline)
-                TextAction(
-                    text = leylaString(R.string.health_connect_action),
-                    onClick = { permissionLauncher.launch(HealthConnectManager.permissions) },
-                    icon = Icons.Filled.MonitorHeart,
-                    color = Theme.rose,
-                    style = IOSText.body.weight(FontWeight.SemiBold),
-                    modifier = Modifier.padding(vertical = 12.dp),
-                )
-            }
-            HorizontalDivider(color = colors.hairline)
-            TextAction(
-                text = leylaString(R.string.health_open_settings),
-                onClick = { runCatching { context.startActivity(HealthConnect.settingsIntent()) } },
-                icon = Icons.AutoMirrored.Filled.OpenInNew,
-                color = Theme.rose,
-                style = IOSText.body.weight(FontWeight.SemiBold),
-                modifier = Modifier.padding(vertical = 12.dp),
-            )
-        }
-        Text(
-            leylaString(R.string.settings_health_footer),
-            style = IOSText.footnote,
-            color = colors.secondary,
-            modifier = Modifier.padding(horizontal = 4.dp),
-        )
-    }
-}
 
 // MARK: - Premium
 

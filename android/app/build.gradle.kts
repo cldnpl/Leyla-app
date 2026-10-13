@@ -28,6 +28,22 @@ val mapsApiKey: String = localProps.getProperty("MAPS_API_KEY") ?: ""
 // sign-in that cannot complete.
 val googleWebClientId: String = localProps.getProperty("GOOGLE_WEB_CLIENT_ID") ?: ""
 
+// Release signing. Put in android/local.properties:
+//   RELEASE_STORE_FILE=/absolute/path/to/leyla-release.jks
+//   RELEASE_STORE_PASSWORD=...
+//   RELEASE_KEY_ALIAS=leyla
+//   RELEASE_KEY_PASSWORD=...
+// Missing on purpose when unset — a debug-signed release build would be
+// rejected by Play, so we'd rather the build fail loudly than sign wrong.
+val releaseStoreFile: String? = localProps.getProperty("RELEASE_STORE_FILE")
+val releaseStorePassword: String? = localProps.getProperty("RELEASE_STORE_PASSWORD")
+val releaseKeyAlias: String? = localProps.getProperty("RELEASE_KEY_ALIAS")
+val releaseKeyPassword: String? = localProps.getProperty("RELEASE_KEY_PASSWORD")
+val hasReleaseSigning = !releaseStoreFile.isNullOrBlank() &&
+    !releaseStorePassword.isNullOrBlank() &&
+    !releaseKeyAlias.isNullOrBlank() &&
+    !releaseKeyPassword.isNullOrBlank()
+
 android {
     namespace = "com.claudianapolitano.leyla"
     compileSdk = 36
@@ -36,12 +52,23 @@ android {
         applicationId = "com.claudianapolitano.leyla"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0.2"
 
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
         buildConfigField("String", "MAPS_API_KEY", "\"$mapsApiKey\"")
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"$googleWebClientId\"")
+    }
+
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = file(releaseStoreFile!!)
+                storePassword = releaseStorePassword
+                keyAlias = releaseKeyAlias
+                keyPassword = releaseKeyPassword
+            }
+        }
     }
 
     buildTypes {
@@ -49,6 +76,9 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            if (hasReleaseSigning) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
@@ -104,8 +134,6 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
     implementation(libs.googleid)
-
-    implementation(libs.androidx.health.connect)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
 

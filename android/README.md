@@ -44,9 +44,6 @@ adb shell am start -n com.claudianapolitano.leyla/.MainActivity
 - `SharedConfig.DEMO_MODE` mirrors the iOS flag: it puts Claudia in Naples and
   Alex in Tashkent so Home is populated before pairing and location sharing
   exist. **Set it to `false` before any public launch.**
-- Where iOS says "Apple Health", the Android build says "Health Connect" — the
-  same data, the platform's own name for it. That is the only copy that
-  deliberately differs.
 - Cards are filled with an opaque colour rather than a translucent one. iOS uses
   `.regularMaterial`; a translucent fill on Android lets each card's own drop
   shadow show through as a darker ring inside its edges, so the fill is the

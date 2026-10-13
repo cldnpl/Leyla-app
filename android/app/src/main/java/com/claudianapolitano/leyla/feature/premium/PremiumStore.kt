@@ -1,5 +1,7 @@
 package com.claudianapolitano.leyla.feature.premium
 
+import com.claudianapolitano.leyla.core.AppPrefs
+import com.claudianapolitano.leyla.core.SharedConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,7 +32,17 @@ object PremiumStore {
 
     val priceLine: String get() = "$DISPLAY_PRICE / month"
 
-    private val _isPremium = MutableStateFlow(false)
+    /**
+     * TEST ONLY ([SharedConfig.DEMO_MODE]): the "0000" pairing bypass also
+     * opens every Premium feature, so a reviewer can see the paid half of the
+     * app without a purchase. Read here rather than pushed from [Session] so a
+     * relaunch restores it with the demo pairing, and so `core` keeps not
+     * knowing about `feature`.
+     */
+    private fun demoEntitlement(): Boolean =
+        SharedConfig.DEMO_MODE && AppPrefs.testPaired
+
+    private val _isPremium = MutableStateFlow(demoEntitlement())
     val isPremium: StateFlow<Boolean> = _isPremium.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)

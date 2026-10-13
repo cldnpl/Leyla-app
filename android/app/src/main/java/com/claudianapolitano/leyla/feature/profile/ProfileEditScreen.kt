@@ -19,8 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -48,7 +46,6 @@ import com.claudianapolitano.leyla.designsystem.LeylaCard
 import com.claudianapolitano.leyla.designsystem.LeylaTheme
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.designsystem.weight
-import com.claudianapolitano.leyla.feature.cycle.CycleState
 import com.claudianapolitano.leyla.feature.together.plainClickable
 import com.claudianapolitano.leyla.feature.together.PrimaryButton
 import com.claudianapolitano.leyla.feature.together.TextAction
@@ -62,8 +59,8 @@ import java.io.ByteArrayOutputStream
 
 /**
  * The account editor Home's profile button opens. Port of the parts of
- * `ProfileEditView` the Android build can already stand behind: display name,
- * profile photo, and the "I have a menstrual cycle" answer.
+ * `ProfileEditView` the Android build can already stand behind: display name
+ * and profile photo.
  *
  * Email changes are not here yet — they need the code-confirmation flow, which
  * lands with the Settings tab.
@@ -73,7 +70,6 @@ data class ProfileUiState(
     val nameDraft: String = "",
     val email: String? = null,
     val avatarPath: String? = null,
-    val hasCycle: Boolean = false,
     val savingName: Boolean = false,
     val uploadingAvatar: Boolean = false,
     val savedNotice: Boolean = false,
@@ -100,11 +96,6 @@ class ProfileViewModel : ViewModel() {
                         avatarPath = s.user?.avatarPath,
                     )
                 }
-            }
-        }
-        viewModelScope.launch {
-            CycleState.snapshot.collect { c ->
-                _state.update { it.copy(hasCycle = c.userHasCycle == true) }
             }
         }
     }
@@ -152,10 +143,6 @@ class ProfileViewModel : ViewModel() {
                 _state.update { it.copy(uploadingAvatar = false, errorMessage = e.message) }
             }
         }
-    }
-
-    fun setHasCycle(hasCycle: Boolean) {
-        viewModelScope.launch { CycleState.setUserHasCycle(hasCycle) }
     }
 }
 
@@ -271,28 +258,6 @@ fun ProfileEditScreen(
                 loading = state.savingName,
                 modifier = Modifier.padding(top = 14.dp),
             )
-        }
-
-        LeylaCard {
-            Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                    Text(
-                        leylaString(R.string.profile_i_have_a_cycle),
-                        style = IOSText.body,
-                        color = colors.ink,
-                    )
-                    Text(
-                        leylaString(R.string.profile_cycle_footer),
-                        style = IOSText.caption,
-                        color = colors.secondary,
-                    )
-                }
-                Switch(
-                    checked = state.hasCycle,
-                    onCheckedChange = viewModel::setHasCycle,
-                    colors = SwitchDefaults.colors(checkedTrackColor = Theme.rose),
-                )
-            }
         }
 
         if (state.errorMessage != null) {

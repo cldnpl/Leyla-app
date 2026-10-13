@@ -133,8 +133,8 @@ fun MainTabView(modifier: Modifier = Modifier) {
                 .padding(innerPadding)
         ) {
             NavHost(navController = navController, startDestination = Tab.HOME.route) {
-                // Home pushes the map, the profile editor and the cycle screen
-                // onto its own stack, so those stay under the tab bar too.
+                // Home pushes the map and the profile editor onto its own
+                // stack, so those stay under the tab bar too.
                 composable(Tab.HOME.route) { HomeTab() }
                 // Games carries its own navigation stack (quiz packs, game
                 // rounds, the paywall), the way iOS wraps the tab in a

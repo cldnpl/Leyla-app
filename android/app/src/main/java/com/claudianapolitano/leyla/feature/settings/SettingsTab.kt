@@ -40,7 +40,6 @@ object SettingsRoutes {
     const val ROOT = "settings/root"
     const val PROFILE = "settings/profile"
     const val RELATIONSHIP = "settings/relationship"
-    const val HEALTH = "settings/health"
     const val LANGUAGE = "settings/language"
     const val PREMIUM = "settings/premium"
     const val PAYWALL = "settings/paywall"
@@ -60,7 +59,6 @@ fun SettingsTab(
     val title = when (route) {
         SettingsRoutes.PROFILE -> leylaString(R.string.profile_title)
         SettingsRoutes.RELATIONSHIP -> leylaString(R.string.settings_relationship)
-        SettingsRoutes.HEALTH -> leylaString(R.string.health_source)
         SettingsRoutes.LANGUAGE -> leylaString(R.string.settings_language)
         SettingsRoutes.PREMIUM -> leylaString(R.string.settings_premium_title)
         SettingsRoutes.ACCOUNT -> leylaString(R.string.settings_account)
@@ -100,7 +98,6 @@ fun SettingsTab(
                     SettingsScreen(
                         onOpenProfile = { navController.navigate(SettingsRoutes.PROFILE) },
                         onOpenRelationship = { navController.navigate(SettingsRoutes.RELATIONSHIP) },
-                        onOpenHealth = { navController.navigate(SettingsRoutes.HEALTH) },
                         onOpenLanguage = { navController.navigate(SettingsRoutes.LANGUAGE) },
                         onOpenPremium = { navController.navigate(SettingsRoutes.PREMIUM) },
                         onOpenAccount = { navController.navigate(SettingsRoutes.ACCOUNT) },
@@ -108,7 +105,6 @@ fun SettingsTab(
                 }
                 composable(SettingsRoutes.PROFILE) { ProfileEditScreen() }
                 composable(SettingsRoutes.RELATIONSHIP) { RelationshipSettingsScreen() }
-                composable(SettingsRoutes.HEALTH) { HealthSettingsScreen() }
                 composable(SettingsRoutes.LANGUAGE) { LanguagePickerScreen() }
                 composable(SettingsRoutes.PREMIUM) {
                     PremiumSettingsScreen(onOpenPaywall = { navController.navigate(SettingsRoutes.PAYWALL) })

@@ -44,8 +44,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.claudianapolitano.leyla.core.ApiException
 import com.claudianapolitano.leyla.core.LeylaApi
 import com.claudianapolitano.leyla.core.Session
-import com.claudianapolitano.leyla.feature.cycle.CycleState
 import com.claudianapolitano.leyla.core.SharedConfig
+import com.claudianapolitano.leyla.feature.premium.PremiumStore
 import com.claudianapolitano.leyla.core.rememberHaptics
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.LeylaCard
@@ -134,10 +134,12 @@ class PairingViewModel : ViewModel() {
         if (!_state.value.canConnect || _state.value.isLoading) return
 
         // TEST ONLY (SharedConfig.DEMO_MODE): "0000" opens the app without a
-        // real partner so the UI can be exercised.
+        // real partner so the UI can be exercised, Premium included — App
+        // review has to reach the paid half without a purchase.
         if (SharedConfig.DEMO_MODE && code == "0000") {
             onPaired()
             Session.enterTestPairing()
+            PremiumStore.setEntitled(true)
             return
         }
 
@@ -154,12 +156,7 @@ class PairingViewModel : ViewModel() {
     }
 
     fun signOut() {
-        viewModelScope.launch {
-            // The partner's shared cycle belongs to the account signing out; the
-            // health connection and cached cycle belong to this phone and stay.
-            CycleState.forgetPartnerData()
-            Session.signOut()
-        }
+        viewModelScope.launch { Session.signOut() }
     }
 
     private fun describe(error: Throwable): String =

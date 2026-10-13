@@ -15,9 +15,6 @@ import com.claudianapolitano.leyla.core.PartnerPronoun
 import com.claudianapolitano.leyla.core.PartnerLocation
 import com.claudianapolitano.leyla.core.Session
 import com.claudianapolitano.leyla.core.SharedConfig
-import com.claudianapolitano.leyla.feature.cycle.CycleState
-import com.claudianapolitano.leyla.feature.cycle.PregnancyEngine
-import com.claudianapolitano.leyla.feature.cycle.PregnancyInsights
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -49,8 +46,6 @@ data class HomeUiState(
     val mapMine: Coordinate? = null,
     val mapPartner: Coordinate? = null,
     val mapKm: Double? = null,
-    val cycle: CycleState.Snapshot = CycleState.Snapshot(),
-    val partnerPregnancyInsights: PregnancyInsights? = null,
 )
 
 class HomeViewModel : ViewModel() {
@@ -69,12 +64,11 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             combine(
                 Session.snapshot,
-                CycleState.snapshot,
                 LocationRepository.currentLocation,
                 LocationRepository.isSharing,
-            ) { session, cycle, myLocation, isSharing ->
-                Quad(session, cycle, myLocation.takeIf { isSharing }, Unit)
-            }.collect { (session, cycle, realMine, _) ->
+            ) { session, myLocation, isSharing ->
+                session to myLocation.takeIf { isSharing }
+            }.collect { (session, realMine) ->
                 _state.update { current ->
                     val mapMine = realMine ?: SAMPLE_MINE.takeIf { SharedConfig.DEMO_MODE }
                     val mapPartner = realPartner() ?: SAMPLE_PARTNER.takeIf { SharedConfig.DEMO_MODE }
@@ -88,8 +82,6 @@ class HomeViewModel : ViewModel() {
                         mapMine = mapMine,
                         mapPartner = mapPartner,
                         mapKm = LocationRepository.kmBetween(mapMine, mapPartner),
-                        cycle = cycle,
-                        partnerPregnancyInsights = partnerPregnancyInsights(cycle),
                     )
                 }
                 // Keep the distance widget in sync with what the Home map shows
@@ -105,7 +97,6 @@ class HomeViewModel : ViewModel() {
         LocationRepository.init(context)
         LocationRepository.refresh(context)
         viewModelScope.launch { loadPartnerLocation() }
-        viewModelScope.launch { CycleState.refreshOnAppear(context) }
         startPolling()
     }
 
@@ -197,17 +188,8 @@ class HomeViewModel : ViewModel() {
         return Coordinate(lat, lng)
     }
 
-    private fun partnerPregnancyInsights(cycle: CycleState.Snapshot): PregnancyInsights? {
-        val pregnancy = cycle.partnerPregnancy ?: return null
-        if (!pregnancy.sharing) return null
-        val due = PregnancyEngine.parseDueDate(pregnancy.dueDate) ?: return null
-        return PregnancyEngine.insights(due)
-    }
-
     override fun onCleared() {
         pollJob?.cancel()
         super.onCleared()
     }
 }
-
-private data class Quad<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)

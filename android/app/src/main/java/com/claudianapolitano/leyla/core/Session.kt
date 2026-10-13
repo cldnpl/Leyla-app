@@ -154,7 +154,7 @@ object Session {
         return true
     }
 
-    /** Publishes a freshly saved account (name, avatar, cycle settings). */
+    /** Publishes a freshly saved account (name, avatar). */
     fun updateUser(user: User) {
         PartnerPrefs.pronoun = PartnerPronoun.from(user.partnerPronoun)
         _snapshot.update { it.copy(user = user) }

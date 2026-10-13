@@ -20,12 +20,6 @@ data class User(
     val createdAt: String? = null,
     /** Whether the address was confirmed with a code we emailed to it. */
     val emailVerified: Boolean? = null,
-    /**
-     * Account-level cycle settings, kept server-side so they survive a
-     * reinstall. `hasCycle` is null when the question was never answered.
-     */
-    val hasCycle: Boolean? = null,
-    val cycleShareLevel: String? = null,
 )
 
 @Serializable
@@ -71,33 +65,6 @@ data class PartnerLocation(
     val lat: Double? = null,
     val lng: Double? = null,
     val mode: String? = null,
-    val partnerName: String? = null,
-    val updatedAt: String? = null,
-)
-
-/**
- * The partner's opt-in shared cycle summary, or `{sharing:false}`. Coarse by
- * design: a phase, and optionally a day count — never raw symptoms.
- */
-@Serializable
-data class PartnerCycle(
-    val sharing: Boolean,
-    val phase: String? = null,
-    val cycleDay: Int? = null,
-    val periodInDays: Int? = null,
-    val note: String? = null,
-    val partnerName: String? = null,
-    val updatedAt: String? = null,
-)
-
-/**
- * The partner's opt-in shared due date, or `{sharing:false}`. Week, trimester
- * and countdown are derived on the client.
- */
-@Serializable
-data class PartnerPregnancy(
-    val sharing: Boolean,
-    val dueDate: String? = null,
     val partnerName: String? = null,
     val updatedAt: String? = null,
 )

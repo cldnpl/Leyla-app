@@ -33,7 +33,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Map
-import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.Icon
@@ -63,18 +62,15 @@ import com.claudianapolitano.leyla.core.rememberHaptics
 import com.claudianapolitano.leyla.designsystem.IOSText
 import com.claudianapolitano.leyla.designsystem.Theme
 import com.claudianapolitano.leyla.designsystem.weight
-import com.claudianapolitano.leyla.feature.cycle.CycleState
 import com.claudianapolitano.leyla.feature.together.PrimaryButton
-import com.claudianapolitano.leyla.feature.together.plainClickable
 import kotlinx.coroutines.launch
 
 /**
  * "About you", shown once right after sign-in and before pairing: the intro
- * carousel, your name, the cycle question, then why Leyla asks for location —
- * explained before the system prompt, not after. Port of
- * `PersonalOnboardingView.swift`.
+ * carousel, your name, then why Leyla asks for location — explained before the
+ * system prompt, not after. Port of `PersonalOnboardingView.swift`.
  */
-private enum class Step { WELCOME, NAME, CYCLE, LOCATION }
+private enum class Step { WELCOME, NAME, LOCATION }
 
 private data class IntroPage(val icon: ImageVector, val title: String, val subtitle: String)
 
@@ -93,11 +89,6 @@ private val introPages = listOf(
         Icons.Filled.Map,
         "Share your world",
         "Watch the distance between you shrink, share moments, and count down to reunions.",
-    ),
-    IntroPage(
-        Icons.Filled.MonitorHeart,
-        "Care for each other",
-        "Cycle-aware tips so you always know how to show up for each other.",
     ),
 )
 
@@ -148,16 +139,10 @@ fun PersonalOnboardingScreen(modifier: Modifier = Modifier) {
                             saving = true
                             Session.updateName(name)
                             saving = false
-                            step = Step.CYCLE
+                            step = Step.LOCATION
                         }
                     },
                 )
-
-                Step.CYCLE -> CycleStep { hasCycle ->
-                    haptics.tap()
-                    scope.launch { CycleState.setUserHasCycle(hasCycle) }
-                    step = Step.LOCATION
-                }
 
                 Step.LOCATION -> LocationStep {
                     haptics.tap()
@@ -180,8 +165,7 @@ fun PersonalOnboardingScreen(modifier: Modifier = Modifier) {
             StepDots(
                 index = when (step) {
                     Step.WELCOME, Step.NAME -> 0
-                    Step.CYCLE -> 1
-                    Step.LOCATION -> 2
+                    Step.LOCATION -> 1
                 },
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -195,7 +179,7 @@ fun PersonalOnboardingScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun StepDots(index: Int, modifier: Modifier = Modifier) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        repeat(3) { i ->
+        repeat(2) { i ->
             Box(
                 Modifier
                     .width(if (i == index) 20.dp else 7.dp)
@@ -308,33 +292,6 @@ private fun NameStep(
 }
 
 @Composable
-private fun CycleStep(onChoose: (Boolean) -> Unit) {
-    StepScaffold(
-        icon = Icons.Filled.Favorite,
-        title = "Do you have a\nmenstrual cycle?",
-        body = "This tailors Leyla for you — track your own cycle, or get gentle tips to " +
-            "support your partner's. You can change it anytime.",
-        // Android's counterpart to Apple Health, named up front the way iOS does.
-        footnote = "If you do, Leyla reads your cycle from Health Connect — only after you " +
-            "allow it. Nothing is written back.",
-    ) {
-        PrimaryButton(text = "Yes, I do", onClick = { onChoose(true) })
-        Spacer(Modifier.size(12.dp))
-        Box(
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White.copy(alpha = 0.18f))
-                .plainClickable { onChoose(false) }
-                .padding(vertical = 16.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Text("No, I don't", style = IOSText.headline, color = Color.White)
-        }
-    }
-}
-
-@Composable
 private fun LocationStep(onContinue: () -> Unit) {
     StepScaffold(
         icon = Icons.Filled.Place,
@@ -346,13 +303,12 @@ private fun LocationStep(onContinue: () -> Unit) {
     }
 }
 
-/** The shared shape of the three question steps: icon, title, body, actions. */
+/** The shared shape of the question steps: icon, title, body, actions. */
 @Composable
 private fun StepScaffold(
     icon: ImageVector,
     title: String,
     body: String,
-    footnote: String? = null,
     actions: @Composable () -> Unit,
 ) {
     Column(
@@ -378,15 +334,6 @@ private fun StepScaffold(
             color = Color.White.copy(alpha = 0.95f),
             textAlign = TextAlign.Center,
         )
-        if (footnote != null) {
-            Spacer(Modifier.size(10.dp))
-            Text(
-                footnote,
-                style = IOSText.footnote,
-                color = Color.White.copy(alpha = 0.9f),
-                textAlign = TextAlign.Center,
-            )
-        }
         Spacer(Modifier.weight(1f))
         actions()
     }

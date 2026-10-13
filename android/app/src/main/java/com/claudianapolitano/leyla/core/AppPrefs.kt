@@ -26,7 +26,7 @@ object AppPrefs {
     }
 
     /**
-     * Whether the person has completed the "about you" onboarding (name, cycle,
+     * Whether the person has completed the "about you" onboarding (name and
      * location), which runs once after sign-in and before pairing.
      */
     var personalOnboardingDone: Boolean
