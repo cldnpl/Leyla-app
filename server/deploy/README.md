@@ -1,7 +1,8 @@
 # Leyla Backend — Deployment
 
-The backend runs on **Railway** and auto-deploys from `main` on every push
-(GitHub Actions → Railway).
+The backend runs on **Railway** and auto-deploys from `main` on every push,
+through Railway's GitHub integration (service `us-app`, Root Directory
+`/server`). There is no GitHub Actions deploy step.
 
 - **Production URL:** `https://us-app-production-9aa4.up.railway.app`
 - **Health check:** `GET /health`
