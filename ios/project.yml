@@ -7,8 +7,8 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    MARKETING_VERSION: "1.1"
-    CURRENT_PROJECT_VERSION: "14"
+    MARKETING_VERSION: "1.2"
+    CURRENT_PROJECT_VERSION: "15"
     TARGETED_DEVICE_FAMILY: "1"
     CODE_SIGN_STYLE: Automatic
 targets:
@@ -35,8 +35,8 @@ targets:
       properties:
         CFBundleDisplayName: "Leyla"
         CFBundleIconName: AppIcon
-        CFBundleShortVersionString: "1.1"
-        CFBundleVersion: "14"
+        CFBundleShortVersionString: "1.2"
+        CFBundleVersion: "15"
         # Only standard HTTPS (ATS) crypto — skips the export-compliance
         # question on every TestFlight upload.
         ITSAppUsesNonExemptEncryption: false
@@ -82,8 +82,8 @@ targets:
       path: UsWidget/Info.plist
       properties:
         CFBundleDisplayName: "Leyla"
-        CFBundleShortVersionString: "1.1"
-        CFBundleVersion: "14"
+        CFBundleShortVersionString: "1.2"
+        CFBundleVersion: "15"
         # Lets the distance widget take its own location fix while it refreshes
         # (only when the user granted "Always"), so it never shows a stale
         # position just because the app hasn't been opened.
