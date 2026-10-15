@@ -41,16 +41,14 @@ func toDomainUser(u store.User) domain.User {
 		avatarURL = &p
 	}
 	return domain.User{
-		ID:              u.ID,
-		Email:           u.Email,
-		EmailVerified:   u.EmailVerified,
-		DisplayName:     u.DisplayName,
-		AvatarPath:      avatarURL,
-		Birthday:        u.Birthday,
-		PartnerPronoun:  u.PartnerPronoun,
-		HasCycle:        u.HasCycle,
-		CycleShareLevel: u.CycleShareLevel,
-		CreatedAt:       u.CreatedAt,
+		ID:             u.ID,
+		Email:          u.Email,
+		EmailVerified:  u.EmailVerified,
+		DisplayName:    u.DisplayName,
+		AvatarPath:     avatarURL,
+		Birthday:       u.Birthday,
+		PartnerPronoun: u.PartnerPronoun,
+		CreatedAt:      u.CreatedAt,
 	}
 }
 

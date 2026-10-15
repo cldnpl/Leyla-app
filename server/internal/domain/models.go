@@ -3,21 +3,15 @@ package domain
 import "time"
 
 // User is a single account. Email/AvatarPath/Birthday are optional.
-//
-// HasCycle and CycleShareLevel are account-level settings the app used to keep
-// only on-device; they live here so they survive a reinstall. HasCycle is nil
-// when the question has never been answered.
 type User struct {
-	ID              string     `json:"id"`
-	Email           *string    `json:"email,omitempty"`
-	EmailVerified   bool       `json:"emailVerified"`
-	DisplayName     string     `json:"displayName"`
-	AvatarPath      *string    `json:"avatarPath,omitempty"`
-	Birthday        *time.Time `json:"birthday,omitempty"`
-	PartnerPronoun  *string    `json:"partnerPronoun,omitempty"`
-	HasCycle        *bool      `json:"hasCycle,omitempty"`
-	CycleShareLevel string     `json:"cycleShareLevel"`
-	CreatedAt       time.Time  `json:"createdAt"`
+	ID             string     `json:"id"`
+	Email          *string    `json:"email,omitempty"`
+	EmailVerified  bool       `json:"emailVerified"`
+	DisplayName    string     `json:"displayName"`
+	AvatarPath     *string    `json:"avatarPath,omitempty"`
+	Birthday       *time.Time `json:"birthday,omitempty"`
+	PartnerPronoun *string    `json:"partnerPronoun,omitempty"`
+	CreatedAt      time.Time  `json:"createdAt"`
 }
 
 // Couple links exactly two users together.
@@ -92,25 +86,4 @@ type PartnerLocation struct {
 	Mode        *string    `json:"mode,omitempty"`
 	PartnerName *string    `json:"partnerName,omitempty"`
 	UpdatedAt   *time.Time `json:"updatedAt,omitempty"`
-}
-
-// PartnerPregnancy is the partner's opt-in shared due date, or {sharing:false}.
-// Week, trimester, and countdown are derived on the client.
-type PartnerPregnancy struct {
-	Sharing     bool       `json:"sharing"`
-	DueDate     *time.Time `json:"dueDate,omitempty"`
-	PartnerName *string    `json:"partnerName,omitempty"`
-	UpdatedAt   *time.Time `json:"updatedAt,omitempty"`
-}
-
-// PartnerCycle is the partner's opt-in shared cycle summary, or {sharing:false}.
-// Deliberately coarse: a phase, and optionally a day count — never symptoms.
-type PartnerCycle struct {
-	Sharing      bool       `json:"sharing"`
-	Phase        *string    `json:"phase,omitempty"`
-	CycleDay     *int       `json:"cycleDay,omitempty"`
-	PeriodInDays *int       `json:"periodInDays,omitempty"`
-	Note         *string    `json:"note,omitempty"`
-	PartnerName  *string    `json:"partnerName,omitempty"`
-	UpdatedAt    *time.Time `json:"updatedAt,omitempty"`
 }

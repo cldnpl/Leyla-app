@@ -28,8 +28,8 @@ Once the secrets exist, every backend push deploys itself — no commands, no SS
 ## Verify a deploy
 
 ```bash
-curl -s -o /dev/null -w "%{http_code}\n" https://usapi.islamov.online/v1/cycle
-# 401 = deployed (route exists, needs auth). 404 = old build still running.
+curl -s -o /dev/null -w "%{http_code}\n" https://usapi.islamov.online/v1/location
+# 401 = API is up (route exists, needs auth).
 ```
 
 ## Manual deploy (fallback, if ever needed)

@@ -23,11 +23,8 @@ type User struct {
 	Birthday       *time.Time
 	PartnerPronoun *string
 	EmailVerified  bool
-	// HasCycle is nil when the user has never been asked.
-	HasCycle        *bool
-	CycleShareLevel string
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
 }
 
 type CreateUserParams struct {
@@ -38,13 +35,13 @@ type CreateUserParams struct {
 	DisplayName  string
 }
 
-const userCols = `id, email, password_hash, apple_user_id, google_user_id, display_name, avatar_path, birthday, partner_pronoun, email_verified, has_cycle, cycle_share_level, created_at, updated_at`
+const userCols = `id, email, password_hash, apple_user_id, google_user_id, display_name, avatar_path, birthday, partner_pronoun, email_verified, created_at, updated_at`
 
 func scanUser(row pgx.Row) (User, error) {
 	var u User
 	err := row.Scan(&u.ID, &u.Email, &u.PasswordHash, &u.AppleUserID, &u.GoogleUserID, &u.DisplayName,
 		&u.AvatarPath, &u.Birthday, &u.PartnerPronoun, &u.EmailVerified,
-		&u.HasCycle, &u.CycleShareLevel, &u.CreatedAt, &u.UpdatedAt)
+		&u.CreatedAt, &u.UpdatedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return User{}, ErrNotFound
 	}
@@ -88,26 +85,22 @@ func (s *Store) LinkGoogleID(ctx context.Context, userID, googleID string) (User
 // UpdateUserProfileParams carries a partial profile update: every field is a
 // pointer, and only the non-nil ones are written.
 type UpdateUserProfileParams struct {
-	DisplayName     *string
-	Birthday        *time.Time
-	PartnerPronoun  *string
-	HasCycle        *bool
-	CycleShareLevel *string
+	DisplayName    *string
+	Birthday       *time.Time
+	PartnerPronoun *string
 }
 
 // UpdateUserProfile updates only the non-nil fields (COALESCE keeps existing values).
 func (s *Store) UpdateUserProfile(ctx context.Context, id string, p UpdateUserProfileParams) (User, error) {
 	return scanUser(s.pool.QueryRow(ctx,
 		`UPDATE users SET
-		   display_name      = COALESCE($2, display_name),
-		   birthday          = COALESCE($3, birthday),
-		   partner_pronoun   = COALESCE($4, partner_pronoun),
-		   has_cycle         = COALESCE($5, has_cycle),
-		   cycle_share_level = COALESCE($6, cycle_share_level),
-		   updated_at        = now()
+		   display_name    = COALESCE($2, display_name),
+		   birthday        = COALESCE($3, birthday),
+		   partner_pronoun = COALESCE($4, partner_pronoun),
+		   updated_at      = now()
 		 WHERE id = $1
 		 RETURNING `+userCols,
-		id, p.DisplayName, p.Birthday, p.PartnerPronoun, p.HasCycle, p.CycleShareLevel))
+		id, p.DisplayName, p.Birthday, p.PartnerPronoun))
 }
 
 // UpdateUserAvatar replaces the avatar_path (or clears it when nil).
